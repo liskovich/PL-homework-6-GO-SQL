@@ -7,7 +7,7 @@ import (
 )
 
 type CommentRepository interface {
-	CreateComment(comment model.Comment) error
+	CreateComment(comment model.CommentMutate) error
 	GetAllUsersComments(userID uint) ([]*model.Comment, error)
 }
 
@@ -19,7 +19,7 @@ func NewCommentRepository(db *sql.DB) CommentRepository {
 	return &commentRepo{db: db}
 }
 
-func (cmntRepo *commentRepo) CreateComment(comment model.Comment) error {
+func (cmntRepo *commentRepo) CreateComment(comment model.CommentMutate) error {
 	_, err := cmntRepo.db.Exec(InsertCommentQuery, comment.AuthorID, comment.Content, comment.CreatedDate, comment.BeerID)
 	return err
 }

@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func ConnectDB() (*sql.DB, error) {
+func ConnectDB() *sql.DB {
 	// Extract credentials to env file
 	username := "postgres"
 	password := "postgres"
@@ -19,18 +19,15 @@ func ConnectDB() (*sql.DB, error) {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
-		return nil, err
 	}
 
 	if err = db.Ping(); err != nil {
 		log.Fatal(err)
-		return nil, err
 	}
 
 	createTables(db)
 	seedData(db)
-
-	return db, nil
+	return db
 }
 
 func createTables(db *sql.DB) {

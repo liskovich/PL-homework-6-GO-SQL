@@ -14,6 +14,7 @@ const (
 	SelectBeerByIdQuery = "SELECT id, name, description, thumbnail FROM beers WHERE id = $1" // TODO: join with comments and upvotes
 	SelectAllBeersQuery = "SELECT id, name, description, thumbnail FROM beers"               // TODO: join with comments and upvotes
 	UpdateBeerQuery     = "UPDATE beers SET name = $1, description = $2, thumbnail = $3 WHERE id = $4"
+	DeleteBeerQuery     = "DELETE FROM beers WHERE id = $1"
 
 	InsertCommentQuery        = "INSERT INTO comments (author_id, content, created_date, beer_id) VALUES ($1, $2, $3, $4)"
 	SelectAllCommentsByUserId = "SELECT id, author_id, content, created_date, beer_id FROM comments WHERE author_id = $1"

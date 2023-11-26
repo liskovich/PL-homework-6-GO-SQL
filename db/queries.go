@@ -1,14 +1,15 @@
 package db
 
 const (
-	CreateUserTableQuery     = "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);"
+	CreateUserTableQuery     = "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);"
 	CreateBeerTableQuery     = "CREATE TABLE IF NOT EXISTS beers (id SERIAL PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL, thumbnail TEXT NOT NULL);"
 	CreateCommentsTableQuery = "CREATE TABLE IF NOT EXISTS comments (id SERIAL PRIMARY KEY, author_id INTEGER REFERENCES users(id), content TEXT NOT NULL, created_date DATE NOT NULL, beer_id INTEGER REFERENCES beers(id));"
 	CreateUpvotesTableQuery  = "CREATE TABLE IF NOT EXISTS upvotes (id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users(id), beer_id INTEGER REFERENCES beers(id), UNIQUE (user_id, beer_id));"
 
-	InsertUserQuery     = "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)"
-	SelectUserByIdQuery = "SELECT id, name, email, password FROM users WHERE id = $1"
-	UpdateUserQuery     = "UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4"
+	InsertUserQuery        = "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)"
+	SelectUserByIdQuery    = "SELECT id, name, email, password FROM users WHERE id = $1"
+	SelectUserByEmailQuery = "SELECT id, name, email, password FROM users WHERE email = $1"
+	UpdateUserQuery        = "UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4"
 
 	InsertBeerQuery     = "INSERT INTO beers (name, description, thumbnail) VALUES ($1, $2, $3)"
 	SelectBeerByIdQuery = "SELECT id, name, description, thumbnail FROM beers WHERE id = $1" // TODO: join with comments and upvotes

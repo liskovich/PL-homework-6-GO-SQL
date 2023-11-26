@@ -2,15 +2,22 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"time"
 
+	"example.com/api/config"
+	"example.com/api/controllers"
 	"example.com/api/db"
+	"example.com/api/router"
 	"example.com/api/service"
-	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
+// https://youtu.be/ma7rUS_vW9M?feature=shared
+
 func main() {
+	config.LoadEnvVariables()
+
 	database := db.ConnectDB()
 	validate := validator.New()
 
@@ -22,14 +29,13 @@ func main() {
 	beerService := service.NewBeerService(beerRepository, commentRepository, upvoteRepository, validate)
 	authService := service.NewAuthService(userRepository, validate)
 
-	router := gin.Default()
+	userController := controllers.NewUserController(authService)
 
-	router.GET("", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, "Hello, world")
-	})
+	router := router.NewRouter(userController, &authService)
 
+	// TODO: extract to env file
 	server := &http.Server{
-		Addr:           ":8888",
+		Addr:           os.Getenv("PORT"),
 		Handler:        router,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,

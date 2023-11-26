@@ -4,11 +4,13 @@ import (
 	"example.com/api/db"
 	"example.com/api/model"
 	"github.com/go-playground/validator/v10"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService interface {
-	Login(user model.User)
+	Login(email string, password string) *model.User
 	Register(user model.UserMutate)
+	GetUserByID(userID uint) *model.User
 }
 
 type AuthServiceImpl struct {
@@ -23,12 +25,50 @@ func NewAuthService(userRepository db.UserRepository, validate *validator.Valida
 	}
 }
 
-// Login implements AuthService.
-func (*AuthServiceImpl) Login(user model.User) {
-	panic("unimplemented")
+func (authSrvc *AuthServiceImpl) Login(email string, password string) *model.User {
+	user, err := authSrvc.UserRepository.GetUserByEmail(email)
+	if err != nil {
+		panic(err)
+	}
+	if user == nil {
+		panic("user not found")
+	}
+	// Compare password with hashed password
+	pwdErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if pwdErr != nil {
+		panic("invalid password")
+	}
+	return user
 }
 
-// Register implements AuthService.
-func (*AuthServiceImpl) Register(user model.UserMutate) {
-	panic("unimplemented")
+func (authSrvc *AuthServiceImpl) Register(user model.UserMutate) {
+	existingUser, err := authSrvc.UserRepository.GetUserByEmail(user.Email)
+	if err != nil {
+		panic(err)
+	}
+	if existingUser != nil {
+		panic("user already registered")
+	}
+	// Hash password
+	hashedPassword, pwdErr := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if pwdErr != nil {
+		panic(pwdErr)
+	}
+	userToCreate := model.UserMutate{
+		Name:     user.Name,
+		Email:    user.Email,
+		Password: string(hashedPassword),
+	}
+	saveErr := authSrvc.UserRepository.CreateUser(userToCreate)
+	if saveErr != nil {
+		panic(saveErr)
+	}
+}
+
+func (authSrvc *AuthServiceImpl) GetUserByID(userID uint) *model.User {
+	user, err := authSrvc.UserRepository.GetUserById(userID)
+	if err != nil {
+		panic(err)
+	}
+	return user
 }

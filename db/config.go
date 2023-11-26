@@ -3,18 +3,22 @@ package db
 import (
 	"database/sql"
 	"log"
+	"os"
 	"strings"
 
 	_ "github.com/lib/pq"
 )
 
 func ConnectDB() *sql.DB {
-	// Extract credentials to env file
-	username := "postgres"
-	password := "postgres"
+	username := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	dbHost := os.Getenv("DB_HOST")
 	connStr := "postgres://username:password@localhost/dbname?sslmode=disable"
 	connStr = strings.Replace(connStr, "username", username, 1)
 	connStr = strings.Replace(connStr, "password", password, 1)
+	connStr = strings.Replace(connStr, "localhost", dbHost, 1)
+	connStr = strings.Replace(connStr, "dbname", dbName, 1)
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

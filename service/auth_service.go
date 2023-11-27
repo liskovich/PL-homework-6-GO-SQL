@@ -59,6 +59,10 @@ func (authSrvc *AuthServiceImpl) Register(user model.UserMutate) {
 		Email:    user.Email,
 		Password: string(hashedPassword),
 	}
+	valErr := authSrvc.Validate.Struct(userToCreate)
+	if valErr != nil {
+		panic(valErr)
+	}
 	saveErr := authSrvc.UserRepository.CreateUser(userToCreate)
 	if saveErr != nil {
 		panic(saveErr)

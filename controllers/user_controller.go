@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -13,12 +12,16 @@ import (
 )
 
 type UserController struct {
-	authService service.AuthService
+	authService    service.AuthService
+	commentService service.CommentService
+	beerService    service.BeerService
 }
 
-func NewUserController(service service.AuthService) *UserController {
+func NewUserController(authSrvc service.AuthService, cmntSrvc service.CommentService, beerSrvc service.BeerService) *UserController {
 	return &UserController{
-		authService: service,
+		authService:    authSrvc,
+		commentService: cmntSrvc,
+		beerService:    beerSrvc,
 	}
 }
 
@@ -71,15 +74,34 @@ func (ctrl *UserController) LoginHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{})
 }
 
-// TODO: remove in prod
-func (ctrl *UserController) ValidateHandler(ctx *gin.Context) {
-	// get user from session
-	user, _ := ctx.Get("user")
+func (ctrl *UserController) UserCommentsHandler(ctx *gin.Context) {
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists || currentUser == nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "You must be logged in",
+		})
+		return
+	}
 
-	// access concrete fields
-	fmt.Println(user.(model.User).Email)
-
+	comments := ctrl.commentService.FindAllUsersComments(currentUser.(model.User).ID)
+	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": user,
+		"data": comments,
+	})
+}
+
+func (ctrl *UserController) UserBeersHandler(ctx *gin.Context) {
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists || currentUser == nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "You must be logged",
+		})
+		return
+	}
+
+	beers := ctrl.beerService.FindByUser(currentUser.(model.User).ID)
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": beers,
 	})
 }

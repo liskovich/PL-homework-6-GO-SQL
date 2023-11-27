@@ -26,7 +26,7 @@ func (cmntRepo *commentRepo) CreateComment(comment model.CommentMutate) error {
 }
 
 func (cmntRepo *commentRepo) GetAllUsersComments(userID uint) ([]model.Comment, error) {
-	rows, err := cmntRepo.db.Query(SelectAllCommentsByUserId, userID)
+	rows, err := cmntRepo.db.Query(SelectAllCommentsByUserIdQuery, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (cmntRepo *commentRepo) GetAllUsersComments(userID uint) ([]model.Comment, 
 }
 
 func (cmntRepo *commentRepo) GetAllBeerComments(beerID uint) ([]model.Comment, error) {
-	rows, err := cmntRepo.db.Query(SelectAllCommentsByBeerId, beerID)
+	rows, err := cmntRepo.db.Query(SelectAllCommentsByBeerIdQuery, beerID)
 	if err != nil {
 		return nil, err
 	}

@@ -9,31 +9,25 @@ import (
 type BeerService interface {
 	Create(beer model.BeerMutate)
 	Update(beerID uint, beer model.BeerMutate)
-	Delete(beerID uint)
-	FindById(beerID uint) model.BeerDetailed
+	Delete(beerID uint, userID uint)
+	FindById(beerID uint) *model.BeerDetailed
+	FindByUser(userID uint) []*model.BeerCompact
 	FindAll() []*model.BeerCompact
-
-	Upvote(beerID uint, userID uint)
-	Downvote(beerID uint, userID uint)
-	Comment(comment model.CommentMutate)
 }
 
 type BeerServiceImpl struct {
 	BeerRepository    db.BeerRepository
 	CommentRepository db.CommentRepository
-	UpvoteRepository  db.UpvoteRepository
 	Validate          *validator.Validate
 }
 
 func NewBeerService(
 	beerRepository db.BeerRepository,
 	commentRepository db.CommentRepository,
-	upvoteRepository db.UpvoteRepository,
 	validate *validator.Validate) BeerService {
 	return &BeerServiceImpl{
 		BeerRepository:    beerRepository,
 		CommentRepository: commentRepository,
-		UpvoteRepository:  upvoteRepository,
 		Validate:          validate,
 	}
 }
@@ -46,10 +40,17 @@ func (brService *BeerServiceImpl) Create(beer model.BeerMutate) {
 	brService.BeerRepository.CreateBeer(beer)
 }
 
-func (brService *BeerServiceImpl) Delete(beerID uint) {
-	err := brService.BeerRepository.DeleteBeer(beerID)
-	if err != nil {
+func (brService *BeerServiceImpl) Delete(beerID uint, userID uint) {
+	beerToDelete, err := brService.BeerRepository.GetBeerById(beerID)
+	if err != nil || beerToDelete == nil {
 		panic(err)
+	}
+	if beerToDelete.AuthorId != userID {
+		panic("You have to be the author of the beer to be able to delete it")
+	}
+	delErr := brService.BeerRepository.DeleteBeer(beerID)
+	if delErr != nil {
+		panic(delErr)
 	}
 }
 
@@ -61,25 +62,37 @@ func (brService *BeerServiceImpl) FindAll() []*model.BeerCompact {
 	return result
 }
 
-func (brService *BeerServiceImpl) FindById(beerID uint) model.BeerDetailed {
+func (brService *BeerServiceImpl) FindById(beerID uint) *model.BeerDetailed {
 	result, err := brService.BeerRepository.GetBeerById(beerID)
 	if err != nil {
 		panic(err)
 	}
-	comments, cmntErr := brService.CommentRepository.GetAllBeerComments(beerID)
-	if cmntErr != nil {
-		panic(cmntErr)
+	if result != nil {
+		comments, cmntErr := brService.CommentRepository.GetAllBeerComments(beerID)
+		if cmntErr != nil {
+			panic(cmntErr)
+		}
+		beerResponse := model.BeerDetailed{
+			ID:           result.ID,
+			Name:         result.Name,
+			Description:  result.Description,
+			Thumbnail:    result.Thumbnail,
+			CommentCount: result.CommentCount,
+			UpvoteCount:  result.UpvoteCount,
+			Comments:     comments,
+		}
+		return &beerResponse
+	} else {
+		return nil
 	}
-	beerResponse := model.BeerDetailed{
-		ID:           result.ID,
-		Name:         result.Name,
-		Description:  result.Description,
-		Thumbnail:    result.Thumbnail,
-		CommentCount: result.CommentCount,
-		UpvoteCount:  result.UpvoteCount,
-		Comments:     comments,
+}
+
+func (brService *BeerServiceImpl) FindByUser(userID uint) []*model.BeerCompact {
+	result, err := brService.BeerRepository.GetBeersByUser(userID)
+	if err != nil {
+		panic(err)
 	}
-	return beerResponse
+	return result
 }
 
 func (brService *BeerServiceImpl) Update(beerID uint, beer model.BeerMutate) {
@@ -87,43 +100,12 @@ func (brService *BeerServiceImpl) Update(beerID uint, beer model.BeerMutate) {
 	if err != nil || beerToUpdate == nil {
 		panic(err)
 	}
+	valErr := brService.Validate.Struct(beer)
+	if valErr != nil {
+		panic(valErr)
+	}
+	if beerToUpdate.AuthorId != beer.AuthorId {
+		panic("You have to be the author of the beer to be able to update it")
+	}
 	brService.BeerRepository.UpdateBeer(beerID, beer)
-}
-
-func (brService *BeerServiceImpl) Comment(comment model.CommentMutate) {
-	// TODO: check if user is authenticated and beer exists
-	err := brService.CommentRepository.CreateComment(comment)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (brService *BeerServiceImpl) Upvote(beerID uint, userID uint) {
-	upvote := model.Upvote{
-		UserID: userID,
-		BeerID: beerID,
-	}
-	exists, err := brService.UpvoteRepository.CheckUpvoteExists(upvote)
-	if exists || err != nil {
-		panic(err)
-	}
-	upvoteErr := brService.UpvoteRepository.CreateUpvote(upvote)
-	if upvoteErr != nil {
-		panic(upvoteErr)
-	}
-}
-
-func (brService *BeerServiceImpl) Downvote(beerID uint, userID uint) {
-	downvote := model.Upvote{
-		UserID: userID,
-		BeerID: beerID,
-	}
-	exists, err := brService.UpvoteRepository.CheckUpvoteExists(downvote)
-	if exists || err != nil {
-		panic(err)
-	}
-	downvoteErr := brService.UpvoteRepository.DeleteUpvote(downvote)
-	if downvoteErr != nil {
-		panic(downvoteErr)
-	}
 }

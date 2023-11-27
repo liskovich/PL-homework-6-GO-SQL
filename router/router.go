@@ -10,7 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(userController *controllers.UserController, authService *service.AuthService) *gin.Engine {
+func NewRouter(
+	userController *controllers.UserController,
+	beerController *controllers.BeerController,
+	authService *service.AuthService,
+) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(middleware.HandlePanic())
@@ -21,8 +25,18 @@ func NewRouter(userController *controllers.UserController, authService *service.
 	baseRouter := router.Group("/api")
 	userRouter := baseRouter.Group("/user")
 
+	// TODO: restructure the user routes to be more API-like
 	userRouter.POST("/register", userController.RegisterHandler)
 	userRouter.POST("/login", userController.LoginHandler)
-	userRouter.GET("/validate", middleware.AuthMiddleware(*authService), userController.ValidateHandler)
+	userRouter.GET("/comments", middleware.AuthMiddleware(*authService), userController.UserCommentsHandler)
+	userRouter.GET("/beers", middleware.AuthMiddleware(*authService), userController.UserBeersHandler)
+
+	beerRouter := baseRouter.Group("/beers")
+	beerRouter.POST("/", middleware.AuthMiddleware(*authService), beerController.CreateHandler)
+	beerRouter.POST("/", beerController.GetAllHandler)
+	beerRouter.PUT("/:beerId", middleware.AuthMiddleware(*authService), beerController.UpdateHandler)
+	beerRouter.DELETE("/:beerId", middleware.AuthMiddleware(*authService), beerController.DeleteHandler)
+	beerRouter.GET("/:beerId", beerController.GetByIdHandler)
+
 	return router
 }

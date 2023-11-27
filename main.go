@@ -26,14 +26,16 @@ func main() {
 	commentRepository := db.NewCommentRepository(database)
 	upvoteRepository := db.NewUpvoteRepository(database)
 
-	beerService := service.NewBeerService(beerRepository, commentRepository, upvoteRepository, validate)
+	beerService := service.NewBeerService(beerRepository, commentRepository, validate)
 	authService := service.NewAuthService(userRepository, validate)
+	commentService := service.NewCommentService(commentRepository, validate)
+	upvoteService := service.NewUpvoteService(upvoteRepository, validate)
 
-	userController := controllers.NewUserController(authService)
+	userController := controllers.NewUserController(authService, commentService, beerService)
+	beerController := controllers.NewBeerController(authService, beerService, commentService, upvoteService)
 
-	router := router.NewRouter(userController, &authService)
+	router := router.NewRouter(userController, beerController, &authService)
 
-	// TODO: extract to env file
 	server := &http.Server{
 		Addr:           os.Getenv("PORT"),
 		Handler:        router,

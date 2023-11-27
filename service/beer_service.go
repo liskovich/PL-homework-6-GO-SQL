@@ -66,18 +66,18 @@ func (brService *BeerServiceImpl) FindById(beerID uint) model.BeerDetailed {
 	if err != nil {
 		panic(err)
 	}
-
-	var comments []model.Comment
-	// TODO: retrieve comments here separately
-
+	comments, cmntErr := brService.CommentRepository.GetAllBeerComments(beerID)
+	if cmntErr != nil {
+		panic(cmntErr)
+	}
 	beerResponse := model.BeerDetailed{
-		ID:            result.ID,
-		Name:          result.Name,
-		Description:   result.Description,
-		Thumbnail:     result.Thumbnail,
-		CommentsCount: result.CommentsCount,
-		UpvotesCount:  result.UpvotesCount,
-		Comments:      comments,
+		ID:           result.ID,
+		Name:         result.Name,
+		Description:  result.Description,
+		Thumbnail:    result.Thumbnail,
+		CommentCount: result.CommentCount,
+		UpvoteCount:  result.UpvoteCount,
+		Comments:     comments,
 	}
 	return beerResponse
 }

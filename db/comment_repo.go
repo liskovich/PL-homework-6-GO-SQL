@@ -8,7 +8,8 @@ import (
 
 type CommentRepository interface {
 	CreateComment(comment model.CommentMutate) error
-	GetAllUsersComments(userID uint) ([]*model.Comment, error)
+	GetAllUsersComments(userID uint) ([]model.Comment, error)
+	GetAllBeerComments(beerID uint) ([]model.Comment, error)
 }
 
 type commentRepo struct {
@@ -24,20 +25,41 @@ func (cmntRepo *commentRepo) CreateComment(comment model.CommentMutate) error {
 	return err
 }
 
-func (cmntRepo *commentRepo) GetAllUsersComments(userID uint) ([]*model.Comment, error) {
+func (cmntRepo *commentRepo) GetAllUsersComments(userID uint) ([]model.Comment, error) {
 	rows, err := cmntRepo.db.Query(SelectAllCommentsByUserId, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	comments := []*model.Comment{}
+	comments := []model.Comment{}
 	for rows.Next() {
 		var comment model.Comment
 		if err := rows.Scan(&comment.ID, &comment.AuthorID, &comment.Content, &comment.CreatedDate, &comment.BeerID); err != nil {
 			return nil, err
 		}
-		comments = append(comments, &comment)
+		comments = append(comments, comment)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return comments, nil
+}
+
+func (cmntRepo *commentRepo) GetAllBeerComments(beerID uint) ([]model.Comment, error) {
+	rows, err := cmntRepo.db.Query(SelectAllCommentsByBeerId, beerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	comments := []model.Comment{}
+	for rows.Next() {
+		var comment model.Comment
+		if err := rows.Scan(&comment.ID, &comment.AuthorID, &comment.Content, &comment.CreatedDate, &comment.BeerID); err != nil {
+			return nil, err
+		}
+		comments = append(comments, comment)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

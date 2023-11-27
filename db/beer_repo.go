@@ -42,8 +42,7 @@ func (bRepo *beerRepo) GetAllBeers() ([]*model.BeerCompact, error) {
 	beers := []*model.BeerCompact{}
 	for rows.Next() {
 		var beer model.BeerCompact
-		// TODO: add the "upvotes_count" and "comments_count"
-		if err := rows.Scan(&beer.ID, &beer.Name, &beer.Description, &beer.Thumbnail); err != nil {
+		if err := rows.Scan(&beer.ID, &beer.Name, &beer.Description, &beer.Thumbnail, &beer.CommentCount, &beer.UpvoteCount); err != nil {
 			return nil, err
 		}
 		beers = append(beers, &beer)
@@ -57,8 +56,7 @@ func (bRepo *beerRepo) GetAllBeers() ([]*model.BeerCompact, error) {
 func (bRepo *beerRepo) GetBeerById(beerID uint) (*model.BeerCompact, error) {
 	row := bRepo.db.QueryRow(SelectBeerByIdQuery, beerID)
 	var beer model.BeerCompact
-	// TODO: add the "upvotes_count", "comments_count" and "comments"
-	err := row.Scan(&beer.ID, &beer.Name, &beer.Description, &beer.Thumbnail)
+	err := row.Scan(&beer.ID, &beer.Name, &beer.Description, &beer.Thumbnail, &beer.CommentCount, &beer.UpvoteCount)
 	if err != nil {
 		return nil, err
 	}

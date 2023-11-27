@@ -12,13 +12,53 @@ const (
 	UpdateUserQuery        = "UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4"
 
 	InsertBeerQuery     = "INSERT INTO beers (name, description, thumbnail) VALUES ($1, $2, $3)"
-	SelectBeerByIdQuery = "SELECT id, name, description, thumbnail FROM beers WHERE id = $1" // TODO: join with comments and upvotes
-	SelectAllBeersQuery = "SELECT id, name, description, thumbnail FROM beers"               // TODO: join with comments and upvotes
-	UpdateBeerQuery     = "UPDATE beers SET name = $1, description = $2, thumbnail = $3 WHERE id = $4"
-	DeleteBeerQuery     = "DELETE FROM beers WHERE id = $1"
+	SelectBeerByIdQuery = `
+		SELECT 
+			b.id,
+    	b.name,
+    	b.description,
+    	b.thumbnail,
+    	COALESCE(comment_count, 0) AS comment_count,
+    	COALESCE(upvote_count, 0) AS upvote_count
+		FROM beers b
+		LEFT JOIN (
+			SELECT beer_id, COUNT(*) AS comment_count
+			FROM comments
+			GROUP BY beer_id
+		) c ON b.id = c.beer_id
+		LEFT JOIN (
+			SELECT beer_id, COUNT(*) AS upvote_count
+			FROM upvotes
+			GROUP BY beer_id
+		) u ON b.id = u.beer_id
+		WHERE b.id = $1
+		`
+	SelectAllBeersQuery = `
+		SELECT 
+			b.id,
+    	b.name,
+    	b.description,
+    	b.thumbnail,
+    	COALESCE(comment_count, 0) AS comment_count,
+    	COALESCE(upvote_count, 0) AS upvote_count
+		FROM beers b
+		LEFT JOIN (
+			SELECT beer_id, COUNT(*) AS comment_count
+			FROM comments
+			GROUP BY beer_id
+		) c ON b.id = c.beer_id
+		LEFT JOIN (
+			SELECT beer_id, COUNT(*) AS upvote_count
+			FROM upvotes
+			GROUP BY beer_id
+		) u ON b.id = u.beer_id
+		`
+	UpdateBeerQuery = "UPDATE beers SET name = $1, description = $2, thumbnail = $3 WHERE id = $4"
+	DeleteBeerQuery = "DELETE FROM beers WHERE id = $1"
 
 	InsertCommentQuery        = "INSERT INTO comments (author_id, content, created_date, beer_id) VALUES ($1, $2, $3, $4)"
 	SelectAllCommentsByUserId = "SELECT id, author_id, content, created_date, beer_id FROM comments WHERE author_id = $1"
+	SelectAllCommentsByBeerId = "SELECT id, author_id, content, created_date, beer_id FROM comments WHERE beer_id = $1"
 
 	InsertUpvoteQuery        = "INSERT INTO upvotes (user_id, beer_id) VALUES ($1, $2)"
 	DeleteUpvoteQuery        = "DELETE FROM upvotes WHERE user_id = $1 AND beer_id = $2"

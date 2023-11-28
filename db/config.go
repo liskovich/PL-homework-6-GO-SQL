@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"example.com/api/model"
 	_ "github.com/lib/pq"
@@ -16,23 +15,22 @@ func ConnectDB() *sql.DB {
 	password := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 	dbHost := os.Getenv("DB_HOST")
-	connStr := "postgres://username:password@localhost/dbname?sslmode=disable"
-	connStr = strings.Replace(connStr, "username", username, 1)
-	connStr = strings.Replace(connStr, "password", password, 1)
-	connStr = strings.Replace(connStr, "localhost", dbHost, 1)
-	connStr = strings.Replace(connStr, "dbname", dbName, 1)
 
+	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", username, password, dbHost, dbName)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
+		// panic(err)
 	}
-
 	if err = db.Ping(); err != nil {
 		log.Fatal(err)
+		// panic(err)
+	} else {
+		log.Println("Connection stable")
 	}
 
+	createTables(db)
 	if isDBEmpty(db) {
-		createTables(db)
 		seedData(db)
 	}
 	return db
@@ -41,8 +39,10 @@ func ConnectDB() *sql.DB {
 func isDBEmpty(db *sql.DB) bool {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM users;").Scan(&count)
+	// err := db.QueryRow("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';").Scan(&count)
 	if err != nil {
 		log.Fatal(err)
+		// panic(err)
 	}
 	return count == 0
 }
@@ -52,8 +52,10 @@ func createTables(db *sql.DB) {
 		_, err := db.Exec(query)
 		if err != nil {
 			log.Fatal(err)
+			// panic(err)
 		}
 	}
+	log.Println("Created tables")
 }
 
 func seedData(db *sql.DB) {
@@ -69,6 +71,7 @@ func seedData(db *sql.DB) {
 	)
 	if err != nil {
 		log.Fatal(err)
+		// panic(err)
 	} else {
 		// insert some beers
 		b1 := fmt.Sprintf(
@@ -87,4 +90,5 @@ func seedData(db *sql.DB) {
 		db.Exec(b2)
 		db.Exec(b3)
 	}
+	log.Println("Data seeded")
 }

@@ -33,7 +33,7 @@ func NewRouter(
 
 	beerRouter := baseRouter.Group("/beers")
 	beerRouter.POST("/", middleware.AuthMiddleware(*authService), beerController.CreateHandler)
-	beerRouter.POST("/", beerController.GetAllHandler)
+	beerRouter.GET("/", beerController.GetAllHandler)
 	beerRouter.PUT("/:beerId", middleware.AuthMiddleware(*authService), beerController.UpdateHandler)
 	beerRouter.DELETE("/:beerId", middleware.AuthMiddleware(*authService), beerController.DeleteHandler)
 	beerRouter.GET("/:beerId", beerController.GetByIdHandler)

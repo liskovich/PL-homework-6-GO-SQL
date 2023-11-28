@@ -79,6 +79,7 @@ func (brService *BeerServiceImpl) FindById(beerID uint) *model.BeerDetailed {
 			Thumbnail:    result.Thumbnail,
 			CommentCount: result.CommentCount,
 			UpvoteCount:  result.UpvoteCount,
+			AuthorId:     result.AuthorId,
 			Comments:     comments,
 		}
 		return &beerResponse

@@ -1,11 +1,21 @@
-version: '3.9'
-
 services:
   postgres:
-    image: postgres:14-alpine
+    image: postgres
+    restart: always
     ports:
       - 5432:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
-    env_file:
-      - .env
+      # - ~/apps/postgres:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: [“CMD-SHELL”, “pg_isready”]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

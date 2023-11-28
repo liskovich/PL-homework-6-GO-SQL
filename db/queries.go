@@ -14,7 +14,7 @@ const (
 			name TEXT NOT NULL, 
 			description TEXT NOT NULL, 
 			thumbnail TEXT NOT NULL,
-			author_id INTEGER REFERENCES users(id), 
+			author_id INTEGER REFERENCES users(id) 
 		);`
 	CreateCommentsTableQuery = `
 		CREATE TABLE IF NOT EXISTS comments (
@@ -45,9 +45,9 @@ const (
     	b.name,
     	b.description,
     	b.thumbnail,
-			b.author_id,
     	COALESCE(comment_count, 0) AS comment_count,
-    	COALESCE(upvote_count, 0) AS upvote_count
+    	COALESCE(upvote_count, 0) AS upvote_count,
+			b.author_id
 		FROM beers b
 		LEFT JOIN (
 			SELECT beer_id, COUNT(*) AS comment_count
@@ -66,9 +66,9 @@ const (
     	b.name,
     	b.description,
     	b.thumbnail,
-			b.author_id,
     	COALESCE(comment_count, 0) AS comment_count,
-    	COALESCE(upvote_count, 0) AS upvote_count
+    	COALESCE(upvote_count, 0) AS upvote_count,
+			b.author_id
 		FROM beers b
 		LEFT JOIN (
 			SELECT beer_id, COUNT(*) AS comment_count
@@ -87,9 +87,9 @@ const (
     	b.name,
     	b.description,
     	b.thumbnail,
-			b.author_id,
     	COALESCE(comment_count, 0) AS comment_count,
-    	COALESCE(upvote_count, 0) AS upvote_count
+    	COALESCE(upvote_count, 0) AS upvote_count,
+			b.author_id
 		FROM beers b
 		LEFT JOIN (
 			SELECT beer_id, COUNT(*) AS comment_count

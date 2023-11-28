@@ -154,6 +154,7 @@ func (ctrl *BeerController) CommentHandler(ctx *gin.Context) {
 	}
 	var body model.CommentMutate
 	body.AuthorID = currentUser.(model.User).ID
+	body.Author = currentUser.(model.User).Name
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{

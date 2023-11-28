@@ -20,6 +20,7 @@ const (
 		CREATE TABLE IF NOT EXISTS comments (
 			id SERIAL PRIMARY KEY, 
 			author_id INTEGER REFERENCES users(id), 
+			author TEXT NOT NULL, 
 			content TEXT NOT NULL, 
 			created_date DATE NOT NULL, 
 			beer_id INTEGER REFERENCES beers(id) ON DELETE CASCADE
@@ -103,9 +104,9 @@ const (
 	UpdateBeerQuery = "UPDATE beers SET name = $1, description = $2, thumbnail = $3 WHERE id = $4;"
 	DeleteBeerQuery = "DELETE FROM beers WHERE id = $1;"
 
-	InsertCommentQuery             = "INSERT INTO comments (author_id, content, created_date, beer_id) VALUES ($1, $2, $3, $4);"
-	SelectAllCommentsByUserIdQuery = "SELECT id, author_id, content, created_date, beer_id FROM comments WHERE author_id = $1;"
-	SelectAllCommentsByBeerIdQuery = "SELECT id, author_id, content, created_date, beer_id FROM comments WHERE beer_id = $1;"
+	InsertCommentQuery             = "INSERT INTO comments (author_id, author, content, created_date, beer_id) VALUES ($1, $2, $3, $4, $5);"
+	SelectAllCommentsByUserIdQuery = "SELECT id, author_id, author, content, created_date, beer_id FROM comments WHERE author_id = $1;"
+	SelectAllCommentsByBeerIdQuery = "SELECT id, author_id, author, content, created_date, beer_id FROM comments WHERE beer_id = $1;"
 
 	InsertUpvoteQuery        = "INSERT INTO upvotes (user_id, beer_id) VALUES ($1, $2);"
 	DeleteUpvoteQuery        = "DELETE FROM upvotes WHERE user_id = $1 AND beer_id = $2;"

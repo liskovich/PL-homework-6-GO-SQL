@@ -22,14 +22,24 @@ func NewUserRepository(db *sql.DB) UserRepository {
 }
 
 func (usrRepo *userRepo) CreateUser(user model.UserMutate) error {
-	_, err := usrRepo.db.Exec(InsertUserQuery, user.Name, user.Email, user.Password)
+	_, err := usrRepo.db.Exec(
+		InsertUserQuery,
+		user.Name,
+		user.Email,
+		user.Password,
+	)
 	return err
 }
 
 func (usrRepo *userRepo) GetUserById(userID uint) (*model.User, error) {
 	row := usrRepo.db.QueryRow(SelectUserByIdQuery, userID)
 	var user model.User
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := row.Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +47,13 @@ func (usrRepo *userRepo) GetUserById(userID uint) (*model.User, error) {
 }
 
 func (usrRepo *userRepo) UpdateUser(userID uint, user model.User) (*model.User, error) {
-	_, err := usrRepo.db.Exec(UpdateUserQuery, user.Name, user.Email, user.Password, userID)
+	_, err := usrRepo.db.Exec(
+		UpdateUserQuery,
+		user.Name,
+		user.Email,
+		user.Password,
+		userID,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +68,12 @@ func (usrRepo *userRepo) UpdateUser(userID uint, user model.User) (*model.User, 
 func (usrRepo *userRepo) GetUserByEmail(email string) (*model.User, error) {
 	row := usrRepo.db.QueryRow(SelectUserByEmailQuery, email)
 	var user model.User
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := row.Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+	)
 	if err != nil {
 		return nil, err
 	}

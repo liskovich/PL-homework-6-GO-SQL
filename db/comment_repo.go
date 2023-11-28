@@ -21,7 +21,14 @@ func NewCommentRepository(db *sql.DB) CommentRepository {
 }
 
 func (cmntRepo *commentRepo) CreateComment(comment model.CommentMutate) error {
-	_, err := cmntRepo.db.Exec(InsertCommentQuery, comment.AuthorID, comment.Content, comment.CreatedDate, comment.BeerID)
+	_, err := cmntRepo.db.Exec(
+		InsertCommentQuery,
+		comment.AuthorID,
+		comment.Author,
+		comment.Content,
+		comment.CreatedDate,
+		comment.BeerID,
+	)
 	return err
 }
 
@@ -35,7 +42,14 @@ func (cmntRepo *commentRepo) GetAllUsersComments(userID uint) ([]model.Comment, 
 	comments := []model.Comment{}
 	for rows.Next() {
 		var comment model.Comment
-		if err := rows.Scan(&comment.ID, &comment.AuthorID, &comment.Content, &comment.CreatedDate, &comment.BeerID); err != nil {
+		if err := rows.Scan(
+			&comment.ID,
+			&comment.AuthorID,
+			&comment.Author,
+			&comment.Content,
+			&comment.CreatedDate,
+			&comment.BeerID,
+		); err != nil {
 			return nil, err
 		}
 		comments = append(comments, comment)
@@ -56,7 +70,14 @@ func (cmntRepo *commentRepo) GetAllBeerComments(beerID uint) ([]model.Comment, e
 	comments := []model.Comment{}
 	for rows.Next() {
 		var comment model.Comment
-		if err := rows.Scan(&comment.ID, &comment.AuthorID, &comment.Content, &comment.CreatedDate, &comment.BeerID); err != nil {
+		if err := rows.Scan(
+			&comment.ID,
+			&comment.AuthorID,
+			&comment.Author,
+			&comment.Content,
+			&comment.CreatedDate,
+			&comment.BeerID,
+		); err != nil {
 			return nil, err
 		}
 		comments = append(comments, comment)

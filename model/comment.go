@@ -5,6 +5,7 @@ package model
 type Comment struct {
 	ID          uint   `json:"id"`
 	AuthorID    uint   `json:"user"`
+	Author      string `json:"user_name"`
 	Content     string `json:"content"`
 	CreatedDate string `json:"createdDate"`
 	BeerID      uint   `json:"beer"`
@@ -12,6 +13,7 @@ type Comment struct {
 
 type CommentMutate struct {
 	AuthorID    uint   `json:"user"`
+	Author      string `json:"user_name"`
 	Content     string `json:"content"`
 	CreatedDate string `json:"createdDate"`
 	BeerID      uint   `json:"beer"`

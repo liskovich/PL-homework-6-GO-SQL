@@ -28,7 +28,7 @@ func main() {
 
 	beerService := service.NewBeerService(beerRepository, commentRepository, validate)
 	authService := service.NewAuthService(userRepository, validate)
-	commentService := service.NewCommentService(commentRepository, validate)
+	commentService := service.NewCommentService(commentRepository, beerRepository, validate)
 	upvoteService := service.NewUpvoteService(upvoteRepository, validate)
 
 	userController := controllers.NewUserController(authService, commentService, beerService)

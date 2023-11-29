@@ -1,6 +1,8 @@
 package service
 
 import (
+	"database/sql"
+
 	"example.com/api/db"
 	"example.com/api/model"
 	"github.com/go-playground/validator/v10"
@@ -33,41 +35,55 @@ func NewBeerService(
 }
 
 func (brService *BeerServiceImpl) Create(beer model.BeerMutate) {
+	// TODO: determine what does it do
 	err := brService.Validate.Struct(beer)
 	if err != nil {
 		panic(err)
 	}
-	brService.BeerRepository.CreateBeer(beer)
+	createErr := brService.BeerRepository.CreateBeer(beer)
+	if createErr != nil {
+		panic(createErr)
+	}
 }
 
 func (brService *BeerServiceImpl) Delete(beerID uint, userID uint) {
 	beerToDelete, err := brService.BeerRepository.GetBeerById(beerID)
-	if err != nil || beerToDelete == nil {
+	switch {
+	case err == sql.ErrNoRows:
+		panic("The beer is already deleted")
+	case err != nil:
 		panic(err)
-	}
-	if beerToDelete.AuthorId != userID {
-		panic("You have to be the author of the beer to be able to delete it")
-	}
-	delErr := brService.BeerRepository.DeleteBeer(beerID)
-	if delErr != nil {
-		panic(delErr)
+	default:
+		if beerToDelete.AuthorId != userID {
+			panic("You have to be the author of the beer to be able to delete it")
+		}
+		delErr := brService.BeerRepository.DeleteBeer(beerID)
+		if delErr != nil {
+			panic(delErr)
+		}
 	}
 }
 
 func (brService *BeerServiceImpl) FindAll() []*model.BeerCompact {
 	result, err := brService.BeerRepository.GetAllBeers()
-	if err != nil {
+	switch {
+	case err == sql.ErrNoRows:
+		return nil
+	case err != nil:
 		panic(err)
+	default:
+		return result
 	}
-	return result
 }
 
 func (brService *BeerServiceImpl) FindById(beerID uint) *model.BeerDetailed {
 	result, err := brService.BeerRepository.GetBeerById(beerID)
-	if err != nil {
+	switch {
+	case err == sql.ErrNoRows:
+		return nil
+	case err != nil:
 		panic(err)
-	}
-	if result != nil {
+	default:
 		comments, cmntErr := brService.CommentRepository.GetAllBeerComments(beerID)
 		if cmntErr != nil {
 			panic(cmntErr)
@@ -83,30 +99,37 @@ func (brService *BeerServiceImpl) FindById(beerID uint) *model.BeerDetailed {
 			Comments:     comments,
 		}
 		return &beerResponse
-	} else {
-		return nil
 	}
 }
 
 func (brService *BeerServiceImpl) FindByUser(userID uint) []*model.BeerCompact {
 	result, err := brService.BeerRepository.GetBeersByUser(userID)
-	if err != nil {
+	switch {
+	case err == sql.ErrNoRows:
+		return nil
+	case err != nil:
 		panic(err)
+	default:
+		return result
 	}
-	return result
 }
 
 func (brService *BeerServiceImpl) Update(beerID uint, beer model.BeerMutate) {
 	beerToUpdate, err := brService.BeerRepository.GetBeerById(beerID)
-	if err != nil || beerToUpdate == nil {
+	switch {
+	case err == sql.ErrNoRows:
+		panic("The beer to update was not found")
+	case err != nil:
 		panic(err)
+	default:
+		// TODO: determine what does it do
+		valErr := brService.Validate.Struct(beer)
+		if valErr != nil {
+			panic(valErr)
+		}
+		if beerToUpdate.AuthorId != beer.AuthorId {
+			panic("You have to be the author of the beer to be able to update it")
+		}
+		brService.BeerRepository.UpdateBeer(beerID, beer)
 	}
-	valErr := brService.Validate.Struct(beer)
-	if valErr != nil {
-		panic(valErr)
-	}
-	if beerToUpdate.AuthorId != beer.AuthorId {
-		panic("You have to be the author of the beer to be able to update it")
-	}
-	brService.BeerRepository.UpdateBeer(beerID, beer)
 }

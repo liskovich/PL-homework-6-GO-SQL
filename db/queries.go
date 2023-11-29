@@ -22,7 +22,7 @@ const (
 			author_id INTEGER REFERENCES users(id), 
 			author TEXT NOT NULL, 
 			content TEXT NOT NULL, 
-			created_date DATE NOT NULL, 
+			created_date BIGINT NOT NULL, 
 			beer_id INTEGER REFERENCES beers(id) ON DELETE CASCADE
 		);`
 	CreateUpvotesTableQuery = `

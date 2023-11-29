@@ -7,7 +7,7 @@ type Comment struct {
 	AuthorID    uint   `json:"user"`
 	Author      string `json:"user_name"`
 	Content     string `json:"content"`
-	CreatedDate string `json:"createdDate"`
+	CreatedDate int64  `json:"created_date"`
 	BeerID      uint   `json:"beer"`
 }
 
@@ -15,6 +15,6 @@ type CommentMutate struct {
 	AuthorID    uint   `json:"user"`
 	Author      string `json:"user_name"`
 	Content     string `json:"content"`
-	CreatedDate string `json:"createdDate"`
+	CreatedDate int64  `json:"created_date"`
 	BeerID      uint   `json:"beer"`
 }

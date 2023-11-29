@@ -20,11 +20,9 @@ func ConnectDB() *sql.DB {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
-		// panic(err)
 	}
 	if err = db.Ping(); err != nil {
 		log.Fatal(err)
-		// panic(err)
 	} else {
 		log.Println("Connection stable")
 	}
@@ -39,10 +37,8 @@ func ConnectDB() *sql.DB {
 func isDBEmpty(db *sql.DB) bool {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM users;").Scan(&count)
-	// err := db.QueryRow("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';").Scan(&count)
 	if err != nil {
 		log.Fatal(err)
-		// panic(err)
 	}
 	return count == 0
 }
@@ -52,16 +48,17 @@ func createTables(db *sql.DB) {
 		_, err := db.Exec(query)
 		if err != nil {
 			log.Fatal(err)
-			// panic(err)
 		}
 	}
 	log.Println("Created tables")
 }
 
 func seedData(db *sql.DB) {
-	// add some default user
+	// TODO: restrucure adding some default user (use service)
 	db.Exec("INSERT INTO users (name, email, password) VALUES ('Admin', 'admin@example.com', 'password_hash');")
 	row := db.QueryRow(SelectUserByEmailQuery, "admin@example.com")
+	// TODO: end
+
 	var user model.User
 	err := row.Scan(
 		&user.ID,
@@ -71,7 +68,6 @@ func seedData(db *sql.DB) {
 	)
 	if err != nil {
 		log.Fatal(err)
-		// panic(err)
 	} else {
 		// insert some beers
 		b1 := fmt.Sprintf(

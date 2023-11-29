@@ -1,6 +1,8 @@
 package service
 
 import (
+	"database/sql"
+
 	"example.com/api/db"
 	"example.com/api/model"
 	"github.com/go-playground/validator/v10"
@@ -27,32 +29,46 @@ func NewUpvoteService(
 }
 
 func (upvtService *UpvoteServiceImpl) Upvote(upvote model.Upvote) {
-	valErr := upvtService.Validate.Struct(upvote)
-	if valErr != nil {
-		panic(valErr)
-	}
 	exists, err := upvtService.UpvoteRepository.CheckUpvoteExists(upvote)
-	if exists || err != nil {
+	switch {
+	case err == sql.ErrNoRows:
+	case err != nil:
 		panic(err)
-	}
-	upvoteErr := upvtService.UpvoteRepository.CreateUpvote(upvote)
-	if upvoteErr != nil {
-		panic(upvoteErr)
+	default:
+		if !exists {
+			valErr := upvtService.Validate.Struct(upvote)
+			if valErr != nil {
+				panic(valErr)
+			}
+			upvoteErr := upvtService.UpvoteRepository.CreateUpvote(upvote)
+			if upvoteErr != nil {
+				panic(upvoteErr)
+			}
+		} else {
+			panic("You already upvoted this beer")
+		}
 	}
 }
 
 func (upvtService *UpvoteServiceImpl) Downvote(downvote model.Upvote) {
-	valErr := upvtService.Validate.Struct(downvote)
-	if valErr != nil {
-		panic(valErr)
-	}
 	exists, err := upvtService.UpvoteRepository.CheckUpvoteExists(downvote)
-	if exists || err != nil {
+	switch {
+	case err == sql.ErrNoRows:
+	case err != nil:
 		panic(err)
-	}
-	downvoteErr := upvtService.UpvoteRepository.DeleteUpvote(downvote)
-	if downvoteErr != nil {
-		panic(downvoteErr)
+	default:
+		if exists {
+			valErr := upvtService.Validate.Struct(downvote)
+			if valErr != nil {
+				panic(valErr)
+			}
+			downvoteErr := upvtService.UpvoteRepository.DeleteUpvote(downvote)
+			if downvoteErr != nil {
+				panic(downvoteErr)
+			}
+		} else {
+			panic("This beer is not upvoted")
+		}
 	}
 }
 

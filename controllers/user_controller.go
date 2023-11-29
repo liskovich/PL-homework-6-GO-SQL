@@ -17,7 +17,11 @@ type UserController struct {
 	beerService    service.BeerService
 }
 
-func NewUserController(authSrvc service.AuthService, cmntSrvc service.CommentService, beerSrvc service.BeerService) *UserController {
+func NewUserController(
+	authSrvc service.AuthService,
+	cmntSrvc service.CommentService,
+	beerSrvc service.BeerService,
+) *UserController {
 	return &UserController{
 		authService:    authSrvc,
 		commentService: cmntSrvc,

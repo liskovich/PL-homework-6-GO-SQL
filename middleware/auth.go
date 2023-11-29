@@ -21,7 +21,7 @@ func AuthMiddleware(authService service.AuthService) gin.HandlerFunc {
 		// decode jwt token
 		token, tokenErr := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", t.Header["alg"])
+				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 			}
 			return []byte(os.Getenv("SECRET")), nil
 		})
@@ -34,8 +34,18 @@ func AuthMiddleware(authService service.AuthService) gin.HandlerFunc {
 			if float64(time.Now().Unix()) > claims["exp"].(float64) {
 				ctx.AbortWithStatus(http.StatusUnauthorized)
 			}
+
 			// retrieve and set user in session
-			user := authService.GetUserByID(claims["sub"].(uint))
+			userIDflt := claims["sub"]
+			floatValue, ok := userIDflt.(float64)
+			var userID uint
+			if !ok {
+				ctx.AbortWithStatus(http.StatusUnauthorized)
+			} else {
+				userID = uint(floatValue)
+			}
+
+			user := authService.GetUserByID(userID)
 			if user == nil {
 				ctx.AbortWithStatus(http.StatusUnauthorized)
 			}
@@ -43,6 +53,54 @@ func AuthMiddleware(authService service.AuthService) gin.HandlerFunc {
 			ctx.Next()
 		} else {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
+		}
+	}
+}
+
+func UserDetailMiddleware(authService service.AuthService) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		tokenStr, err := ctx.Cookie("Authorization")
+		if err != nil {
+			ctx.Next()
+		}
+		// otherwise, try to get logged in user details
+		// if something below fails, assume that the user is not logged in and move on
+
+		// decode jwt token
+		token, tokenErr := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+			}
+			return []byte(os.Getenv("SECRET")), nil
+		})
+		if tokenErr != nil {
+			ctx.Next()
+		}
+
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			// check if jwt token expired
+			if float64(time.Now().Unix()) > claims["exp"].(float64) {
+				ctx.Next()
+			}
+
+			// retrieve and set user in session
+			userIDflt := claims["sub"]
+			floatValue, ok := userIDflt.(float64)
+			var userID uint
+			if !ok {
+				ctx.Next()
+			} else {
+				userID = uint(floatValue)
+			}
+
+			user := authService.GetUserByID(userID)
+			if user == nil {
+				ctx.Next()
+			}
+			ctx.Set("user", user)
+			ctx.Next()
+		} else {
+			ctx.Next()
 		}
 	}
 }

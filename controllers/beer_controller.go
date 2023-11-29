@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"example.com/api/model"
 	"example.com/api/service"
@@ -32,14 +33,14 @@ func NewBeerController(
 
 func (ctrl *BeerController) CreateHandler(ctx *gin.Context) {
 	currentUser, usrKeyExists := ctx.Get("user")
-	if !usrKeyExists || currentUser == nil {
+	if !usrKeyExists && currentUser == nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"error": "You must be logged in to create a beer",
 		})
 		return
 	}
 	var body model.BeerMutate
-	body.AuthorId = currentUser.(model.User).ID
+	body.AuthorId = currentUser.(*model.User).ID
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -62,7 +63,7 @@ func (ctrl *BeerController) UpdateHandler(ctx *gin.Context) {
 		return
 	}
 	var body model.BeerMutate
-	body.AuthorId = currentUser.(model.User).ID
+	body.AuthorId = currentUser.(*model.User).ID
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -100,7 +101,7 @@ func (ctrl *BeerController) DeleteHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	ctrl.beerService.Delete(uint(beerID), currentUser.(model.User).ID)
+	ctrl.beerService.Delete(uint(beerID), currentUser.(*model.User).ID)
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(http.StatusNoContent, gin.H{})
 }
@@ -133,7 +134,7 @@ func (ctrl *BeerController) GetByIdHandler(ctx *gin.Context) {
 	if usrKeyExists && currentUser != nil {
 		hasUpvoted = ctrl.upvoteService.CheckIfUserUpvoted(model.Upvote{
 			BeerID: beer.ID,
-			UserID: currentUser.(model.User).ID,
+			UserID: currentUser.(*model.User).ID,
 		})
 	}
 
@@ -145,6 +146,14 @@ func (ctrl *BeerController) GetByIdHandler(ctx *gin.Context) {
 }
 
 func (ctrl *BeerController) CommentHandler(ctx *gin.Context) {
+	beerIDStr := ctx.Param("beerId")
+	beerID, paramErr := strconv.Atoi(beerIDStr)
+	if paramErr != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
 	currentUser, usrKeyExists := ctx.Get("user")
 	if !usrKeyExists || currentUser == nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -153,8 +162,10 @@ func (ctrl *BeerController) CommentHandler(ctx *gin.Context) {
 		return
 	}
 	var body model.CommentMutate
-	body.AuthorID = currentUser.(model.User).ID
-	body.Author = currentUser.(model.User).Name
+	body.AuthorID = currentUser.(*model.User).ID
+	body.Author = currentUser.(*model.User).Name
+	body.BeerID = uint(beerID)
+	body.CreatedDate = time.Now().Unix()
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -175,7 +186,16 @@ func (ctrl *BeerController) CommentHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{})
 }
 
+// TODO: fix when tries to upvote several times
 func (ctrl *BeerController) UpvoteHandler(ctx *gin.Context) {
+	beerIDStr := ctx.Param("beerId")
+	beerID, paramErr := strconv.Atoi(beerIDStr)
+	if paramErr != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
 	currentUser, usrKeyExists := ctx.Get("user")
 	if !usrKeyExists || currentUser == nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -184,6 +204,8 @@ func (ctrl *BeerController) UpvoteHandler(ctx *gin.Context) {
 		return
 	}
 	var body model.Upvote
+	body.UserID = currentUser.(*model.User).ID
+	body.BeerID = uint(beerID)
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -204,7 +226,16 @@ func (ctrl *BeerController) UpvoteHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{})
 }
 
+// TODO: fix when tries to downvote several times
 func (ctrl *BeerController) DownvoteHandler(ctx *gin.Context) {
+	beerIDStr := ctx.Param("beerId")
+	beerID, paramErr := strconv.Atoi(beerIDStr)
+	if paramErr != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
 	currentUser, usrKeyExists := ctx.Get("user")
 	if !usrKeyExists || currentUser == nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -213,6 +244,8 @@ func (ctrl *BeerController) DownvoteHandler(ctx *gin.Context) {
 		return
 	}
 	var body model.Upvote
+	body.UserID = currentUser.(*model.User).ID
+	body.BeerID = uint(beerID)
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{

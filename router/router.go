@@ -5,23 +5,19 @@ import (
 	"example.com/api/middleware"
 	"example.com/api/service"
 
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
 func NewRouter(
 	userController *controllers.UserController,
 	beerController *controllers.BeerController,
+	uiController *controllers.UIController,
 	authService *service.AuthService,
 ) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(middleware.HandlePanic())
 
-	router.GET("", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, "welcome home")
-	})
 	baseRouter := router.Group("/api")
 	userRouter := baseRouter.Group("/user")
 
@@ -45,6 +41,17 @@ func NewRouter(
 	beerRouter.POST("/:beerId/comment", auth, beerController.CommentHandler)
 	beerRouter.POST("/:beerId/upvote", auth, beerController.UpvoteHandler)
 	beerRouter.POST("/:beerId/downvote", auth, beerController.DownvoteHandler)
+
+	// UI routes
+	router.LoadHTMLGlob("templates/*.tmpl")
+	uiRouter := router.Group("/")
+
+	uiRouter.GET("/", uiController.Index)
+
+	uiRouter.GET("/register", uiController.RegisterGET)
+	uiRouter.GET("/login", uiController.LoginGET)
+	uiRouter.POST("/register", uiController.RegisterPOST)
+	uiRouter.POST("/login", uiController.LoginPOST)
 
 	return router
 }

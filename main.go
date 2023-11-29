@@ -21,20 +21,58 @@ func main() {
 	database := db.ConnectDB()
 	validate := validator.New()
 
+	// init repositories
 	userRepository := db.NewUserRepository(database)
 	beerRepository := db.NewBeerRepository(database)
 	commentRepository := db.NewCommentRepository(database)
 	upvoteRepository := db.NewUpvoteRepository(database)
 
-	beerService := service.NewBeerService(beerRepository, commentRepository, validate)
-	authService := service.NewAuthService(userRepository, validate)
-	commentService := service.NewCommentService(commentRepository, beerRepository, validate)
-	upvoteService := service.NewUpvoteService(upvoteRepository, validate)
+	// init service layer
+	beerService := service.NewBeerService(
+		beerRepository,
+		commentRepository,
+		validate,
+	)
+	authService := service.NewAuthService(
+		userRepository,
+		validate,
+	)
+	commentService := service.NewCommentService(
+		commentRepository,
+		beerRepository,
+		validate,
+	)
+	upvoteService := service.NewUpvoteService(
+		upvoteRepository,
+		validate,
+	)
 
-	userController := controllers.NewUserController(authService, commentService, beerService)
-	beerController := controllers.NewBeerController(authService, beerService, commentService, upvoteService)
+	// init controllers
+	userController := controllers.NewUserController(
+		authService,
+		commentService,
+		beerService,
+	)
+	beerController := controllers.NewBeerController(
+		authService,
+		beerService,
+		commentService,
+		upvoteService,
+	)
+	uiController := controllers.NewUIController(
+		authService,
+		beerService,
+		commentService,
+		upvoteService,
+	)
 
-	router := router.NewRouter(userController, beerController, &authService)
+	// init server
+	router := router.NewRouter(
+		userController,
+		beerController,
+		uiController,
+		&authService,
+	)
 
 	server := &http.Server{
 		Addr:           os.Getenv("PORT"),

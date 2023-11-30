@@ -47,11 +47,23 @@ func NewRouter(
 	uiRouter := router.Group("/")
 
 	uiRouter.GET("/", uiController.Index)
+	uiRouter.GET("/dashboard", auth, uiController.UserDashboard)
 
 	uiRouter.GET("/register", uiController.RegisterGET)
 	uiRouter.GET("/login", uiController.LoginGET)
 	uiRouter.POST("/register", uiController.RegisterPOST)
 	uiRouter.POST("/login", uiController.LoginPOST)
+
+	uiRouter.GET("/beers", uiController.BeersList)
+	uiRouter.GET("/beers/create", auth, uiController.BeersCreateGET)
+	uiRouter.POST("/beers/create", auth, uiController.BeersCreatePOST)
+	uiRouter.GET("/beers/:beerId", optionalUserDetail, uiController.BeersDetail)
+	uiRouter.GET("/beers/:beerId/edit", auth, uiController.BeersEditGET)
+	uiRouter.POST("/beers/:beerId/edit", auth, uiController.BeersEditPOST)
+	uiRouter.POST("/beers/delete", auth, uiController.BeersDeletePOST)
+
+	uiRouter.POST("/beers/:beerId/comment", auth, uiController.CommentPOST)
+	uiRouter.POST("/beers/:beerId/vote", auth, uiController.UpvoteDownvotePOST)
 
 	return router
 }

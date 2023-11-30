@@ -32,6 +32,15 @@ func NewUIController(
 	}
 }
 
+func (ctrl *UIController) Index(ctx *gin.Context) {
+	ctx.HTML(http.StatusOK, "index.tmpl", gin.H{})
+}
+
+func (ctrl *UIController) UserDashboard(ctx *gin.Context) {
+	// TODO: pass data to template
+	ctx.HTML(http.StatusOK, "dashboard.tmpl", gin.H{})
+}
+
 // auth endpoints
 func (ctrl *UIController) RegisterGET(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "register.tmpl", gin.H{})
@@ -94,9 +103,47 @@ func (ctrl *UIController) LoginPOST(ctx *gin.Context) {
 }
 
 // beer basic CRUD
-func (ctrl *UIController) Index(ctx *gin.Context) {
+func (ctrl *UIController) BeersList(ctx *gin.Context) {
 	// TODO: pass data to template
-	ctx.HTML(http.StatusOK, "index.tmpl", gin.H{})
+	ctx.HTML(http.StatusOK, "beers.tmpl", gin.H{})
+}
+
+func (ctrl *UIController) BeersDetail(ctx *gin.Context) {
+	// TODO: pass data to template
+	ctx.HTML(http.StatusOK, "beers_detail.tmpl", gin.H{})
+}
+
+func (ctrl *UIController) BeersCreateGET(ctx *gin.Context) {
+	// TODO: pass data to template
+	ctx.HTML(http.StatusOK, "beers_create.tmpl", gin.H{})
+}
+
+func (ctrl *UIController) BeersCreatePOST(ctx *gin.Context) {
+	// TODO: redirect to newly created beer
+	ctx.Redirect(http.StatusFound, "/beers")
+}
+
+func (ctrl *UIController) BeersEditGET(ctx *gin.Context) {
+	// TODO: pass data to template
+	ctx.HTML(http.StatusOK, "beers_edit.tmpl", gin.H{})
+}
+
+func (ctrl *UIController) BeersEditPOST(ctx *gin.Context) {
+	// TODO: redirect to updated beer
+	ctx.Redirect(http.StatusFound, "/beers")
+}
+
+func (ctrl *UIController) BeersDeletePOST(ctx *gin.Context) {
+	ctx.Redirect(http.StatusFound, "/beers")
 }
 
 // additional features
+func (ctrl *UIController) CommentPOST(ctx *gin.Context) {
+	// TODO: redirect to the commented beer
+	ctx.Redirect(http.StatusFound, "/beers")
+}
+
+func (ctrl *UIController) UpvoteDownvotePOST(ctx *gin.Context) {
+	// TODO: redirect to the upvoted / downvoted beer
+	ctx.Redirect(http.StatusFound, "/beers")
+}

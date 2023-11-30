@@ -78,6 +78,15 @@ func (ctrl *UserController) LoginHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{})
 }
 
+func (ctrl *UserController) LogoutHandler(ctx *gin.Context) {
+	// clear the Authorization cookie
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie("Authorization", "", -1, "", "", false, true)
+
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, gin.H{})
+}
+
 func (ctrl *UserController) UserCommentsHandler(ctx *gin.Context) {
 	currentUser, usrKeyExists := ctx.Get("user")
 	if !usrKeyExists || currentUser == nil {

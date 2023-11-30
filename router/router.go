@@ -34,7 +34,10 @@ func NewRouter(
 		"/login",
 		userController.LoginHandler,
 	)
-	// TODO: add log out
+	userRouter.POST(
+		"/logout",
+		userController.LogoutHandler,
+	)
 	userRouter.GET(
 		"/comments",
 		auth,
@@ -123,7 +126,10 @@ func NewRouter(
 		"/login",
 		uiController.LoginPOST,
 	)
-	// TODO: add log out
+	uiRouter.POST(
+		"/logout",
+		uiController.LogoutPOST,
+	)
 
 	// basic beer CRUD
 	uiRouter.GET(

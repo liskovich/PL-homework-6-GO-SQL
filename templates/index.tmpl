@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>BeerHunt</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      header h1 {
+        margin: 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        text-decoration: none;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .btn:hover {
+        background-color: #d32f2f;
+      }
+      main {
+        padding: 20px;
+      }
+      section {
+        margin-bottom: 40px;
+      }
+      section h2 {
+        text-align: center;
+      }
+      .section-img {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+        /* margin-bottom: 20px; */
+      }
+      .section-img div {
+        flex: 0 0 45%;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .section-img img {
+        width: 100%;
+        max-height: 400px;
+        height: auto;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+      .author {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        font-style: italic;
+      }
+      .section-text {
+        text-align: justify;
+      }
+      .centerText {
+        text-align: center;
+      }
+      .spacedSection {
+        margin-top: 50px;
+        margin-bottom: 70px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>BeerHunt 🍻</h1>
+    </header>
+
+    <main>
+      <section>
+        <div class="spacedSection">
+          <h2>Welcome to Beer Hunt!</h2>
+          <div class="section-text">
+            <p class="centerText">
+              It is like
+              <a href="https://www.producthunt.com/">Product Hunt</a> but for
+              Beers! Add, comment and upvote your favorites here.
+            </p>
+          </div>
+          <div class="centerText">
+            <a href="/beers" class="btn">See All Beers</a>
+          </div>
+        </div>
+        <div class="section-img">
+          <div>
+            <img src="../../static/img/beer_1.jpg" alt="Beer Image 1" />
+            <p class="author">
+              <a
+                style="color: white"
+                href="https://www.pexels.com/photo/stainless-steel-beer-dispenser-159291/"
+                >Photo by Pixabay</a
+              >
+            </p>
+          </div>
+          <div>
+            <img src="../../static/img/beer_2.jpg" alt="Beer Image 2" />
+            <p class="author">
+              <a
+                style="color: white"
+                href="https://www.pexels.com/photo/photo-of-corona-extra-bottles-on-bucket-1089932/"
+                >Photo by Tembela Bohle</a
+              >
+            </p>
+          </div>
+        </div>
+        <div class="spacedSection">
+          <h2>Discover New Flavors</h2>
+          <div class="section-text">
+            <p class="centerText">
+              Explore the finest collection of craft beers and enjoy the taste
+              of unique flavors.
+            </p>
+          </div>
+          <div class="centerText">
+            <a href="/beers" class="btn">Explore Beers</a>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-img">
+          <div>
+            <img src="../../static/img/beer_3.jpg" alt="Beer Image 3" />
+            <p class="author">
+              <a
+                style="color: white"
+                href="https://www.pexels.com/photo/three-assorted-beverage-bottles-on-brown-wooden-table-667986/"
+                >Photo by Edward Eyer</a
+              >
+            </p>
+          </div>
+          <div>
+            <img src="../../static/img/beer_4.jpg" alt="Beer Image 4" />
+            <p class="author">
+              <a
+                style="color: white"
+                href="https://www.pexels.com/photo/blue-harp-decor-on-brown-wooden-table-63633/"
+                >Photo by Pixabay</a
+              >
+            </p>
+          </div>
+        </div>
+        <div class="spacedSection">
+          <h2>New Level Beer Experience</h2>
+          <div class="section-text">
+            <p class="centerText">
+              Expand your beer palate with our diverse range of brews from
+              around the world.
+            </p>
+          </div>
+          <div class="centerText">
+            <a href="/beers" class="btn">See More Beers</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

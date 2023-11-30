@@ -90,6 +90,9 @@ func NewRouter(
 	)
 
 	// UI routes
+	// Serve static files (CSS, JavaScript, images, etc.)
+	router.Static("/static", "./static")
+
 	router.LoadHTMLGlob("templates/*.tmpl")
 	uiRouter := router.Group("/")
 

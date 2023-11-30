@@ -65,7 +65,7 @@ func (ctrl *UIController) RegisterPOST(ctx *gin.Context) {
 	}
 
 	ctrl.authService.Register(body)
-	ctx.Redirect(http.StatusFound, "/")
+	ctx.Redirect(http.StatusFound, "/beers")
 }
 
 func (ctrl *UIController) LoginPOST(ctx *gin.Context) {
@@ -74,7 +74,7 @@ func (ctrl *UIController) LoginPOST(ctx *gin.Context) {
 		Password string
 	}
 	if ctx.Bind(&body) != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.HTML(http.StatusBadRequest, "error.tmpl", gin.H{
 			"error": "Failed to parse request body",
 		})
 		return
@@ -88,7 +88,7 @@ func (ctrl *UIController) LoginPOST(ctx *gin.Context) {
 	})
 	tokenStr, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.HTML(http.StatusBadRequest, "error.tmpl", gin.H{
 			"error": "Failed to create token",
 		})
 		return
@@ -97,15 +97,22 @@ func (ctrl *UIController) LoginPOST(ctx *gin.Context) {
 	// save to cookies
 	ctx.SetSameSite(http.SameSiteLaxMode)
 	ctx.SetCookie("Authorization", tokenStr, 3600*24*30, "", "", false, true)
+	ctx.Redirect(http.StatusFound, "/beers")
+}
 
-	ctx.Header("Content-Type", "application/json")
-	ctx.JSON(http.StatusOK, gin.H{})
+func (ctrl *UIController) LogoutPOST(ctx *gin.Context) {
+	// clear the Authorization cookie
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie("Authorization", "", -1, "", "", false, true)
+	ctx.Redirect(http.StatusFound, "/")
 }
 
 // beer basic CRUD
 func (ctrl *UIController) BeersList(ctx *gin.Context) {
-	// TODO: pass data to template
-	ctx.HTML(http.StatusOK, "beers.tmpl", gin.H{})
+	beers := ctrl.beerService.FindAll()
+	ctx.HTML(http.StatusOK, "beers", gin.H{
+		"Beers": beers,
+	})
 }
 
 func (ctrl *UIController) BeersDetail(ctx *gin.Context) {

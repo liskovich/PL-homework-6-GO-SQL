@@ -11,7 +11,7 @@ type BeerRepository interface {
 	UpdateBeer(beerID uint, beer model.BeerMutate) (*model.BeerCompact, error)
 	DeleteBeer(beerID uint) error
 	GetBeerById(beerID uint) (*model.BeerCompact, error)
-	GetAllBeers() ([]*model.BeerCompact, error)
+	GetAllBeers() ([]model.BeerCompact, error)
 	GetBeersByUser(userID uint) ([]*model.BeerCompact, error)
 }
 
@@ -39,14 +39,14 @@ func (bRepo *beerRepo) DeleteBeer(beerID uint) error {
 	return err
 }
 
-func (bRepo *beerRepo) GetAllBeers() ([]*model.BeerCompact, error) {
+func (bRepo *beerRepo) GetAllBeers() ([]model.BeerCompact, error) {
 	rows, err := bRepo.db.Query(SelectAllBeersQuery)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	beers := []*model.BeerCompact{}
+	beers := []model.BeerCompact{}
 	for rows.Next() {
 		var beer model.BeerCompact
 		if err := rows.Scan(
@@ -60,7 +60,7 @@ func (bRepo *beerRepo) GetAllBeers() ([]*model.BeerCompact, error) {
 		); err != nil {
 			return nil, err
 		}
-		beers = append(beers, &beer)
+		beers = append(beers, beer)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

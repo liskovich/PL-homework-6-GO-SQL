@@ -14,7 +14,7 @@ type BeerService interface {
 	Delete(beerID uint, userID uint)
 	FindById(beerID uint) *model.BeerDetailed
 	FindByUser(userID uint) []*model.BeerCompact
-	FindAll() []*model.BeerCompact
+	FindAll() []model.BeerCompact
 }
 
 type BeerServiceImpl struct {
@@ -64,7 +64,7 @@ func (brService *BeerServiceImpl) Delete(beerID uint, userID uint) {
 	}
 }
 
-func (brService *BeerServiceImpl) FindAll() []*model.BeerCompact {
+func (brService *BeerServiceImpl) FindAll() []model.BeerCompact {
 	result, err := brService.BeerRepository.GetAllBeers()
 	switch {
 	case err == sql.ErrNoRows:

@@ -74,6 +74,8 @@ func (ctrl *UIController) LoginPOST(ctx *gin.Context) {
 		Email    string
 		Password string
 	}
+	body.Email = ctx.PostForm("email")
+	body.Password = ctx.PostForm("password")
 	if ctx.Bind(&body) != nil {
 		ctx.HTML(http.StatusBadRequest, "error", gin.H{
 			"error": "Failed to parse request body",
@@ -149,12 +151,31 @@ func (ctrl *UIController) BeersDetail(ctx *gin.Context) {
 }
 
 func (ctrl *UIController) BeersCreateGET(ctx *gin.Context) {
-	// TODO: pass data to template
-	ctx.HTML(http.StatusOK, "beers_create.tmpl", gin.H{})
+	ctx.HTML(http.StatusOK, "beers_create", gin.H{})
 }
 
 func (ctrl *UIController) BeersCreatePOST(ctx *gin.Context) {
-	// TODO: redirect to newly created beer
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists && currentUser == nil {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "You must be logged in to create a beer",
+		})
+		return
+	}
+
+	var body model.BeerMutate
+	body.Name = ctx.PostForm("name")
+	body.Description = ctx.PostForm("description")
+	body.Thumbnail = ctx.PostForm("thumbnail")
+	body.AuthorId = currentUser.(*model.User).ID
+	if ctx.Bind(&body) != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Failed to parse request body",
+		})
+		return
+	}
+
+	ctrl.beerService.Create(body)
 	ctx.Redirect(http.StatusFound, "/beers")
 }
 

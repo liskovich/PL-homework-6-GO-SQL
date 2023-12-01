@@ -33,21 +33,21 @@ func NewUIController(
 }
 
 func (ctrl *UIController) Index(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "index.tmpl", gin.H{})
+	ctx.HTML(http.StatusOK, "index", gin.H{})
 }
 
 func (ctrl *UIController) UserDashboard(ctx *gin.Context) {
 	// TODO: pass data to template
-	ctx.HTML(http.StatusOK, "dashboard.tmpl", gin.H{})
+	ctx.HTML(http.StatusOK, "dashboard", gin.H{})
 }
 
 // auth endpoints
 func (ctrl *UIController) RegisterGET(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "register.tmpl", gin.H{})
+	ctx.HTML(http.StatusOK, "register", gin.H{})
 }
 
 func (ctrl *UIController) LoginGET(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "login.tmpl", gin.H{})
+	ctx.HTML(http.StatusOK, "login", gin.H{})
 }
 
 func (ctrl *UIController) RegisterPOST(ctx *gin.Context) {
@@ -58,7 +58,7 @@ func (ctrl *UIController) RegisterPOST(ctx *gin.Context) {
 	}
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
-		ctx.HTML(http.StatusBadRequest, "error.tmpl", gin.H{
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
 			"error": "Failed to parse request body",
 		})
 		return
@@ -74,7 +74,7 @@ func (ctrl *UIController) LoginPOST(ctx *gin.Context) {
 		Password string
 	}
 	if ctx.Bind(&body) != nil {
-		ctx.HTML(http.StatusBadRequest, "error.tmpl", gin.H{
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
 			"error": "Failed to parse request body",
 		})
 		return
@@ -88,7 +88,7 @@ func (ctrl *UIController) LoginPOST(ctx *gin.Context) {
 	})
 	tokenStr, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
-		ctx.HTML(http.StatusBadRequest, "error.tmpl", gin.H{
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
 			"error": "Failed to create token",
 		})
 		return

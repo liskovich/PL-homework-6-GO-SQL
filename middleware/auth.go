@@ -62,6 +62,7 @@ func UserDetailMiddleware(authService service.AuthService) gin.HandlerFunc {
 		tokenStr, err := ctx.Cookie("Authorization")
 		if err != nil {
 			ctx.Next()
+			return
 		}
 		// otherwise, try to get logged in user details
 		// if something below fails, assume that the user is not logged in and move on
@@ -75,8 +76,10 @@ func UserDetailMiddleware(authService service.AuthService) gin.HandlerFunc {
 		})
 		if tokenErr != nil {
 			ctx.Next()
+			return
 		}
 
+		// TODO: fix error - runtime error: invalid memory address or nil pointer dereference
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			// check if jwt token expired
 			if float64(time.Now().Unix()) > claims["exp"].(float64) {
@@ -89,6 +92,7 @@ func UserDetailMiddleware(authService service.AuthService) gin.HandlerFunc {
 			var userID uint
 			if !ok {
 				ctx.Next()
+				return
 			} else {
 				userID = uint(floatValue)
 			}
@@ -96,11 +100,13 @@ func UserDetailMiddleware(authService service.AuthService) gin.HandlerFunc {
 			user := authService.GetUserByID(userID)
 			if user == nil {
 				ctx.Next()
+				return
 			}
 			ctx.Set("user", user)
 			ctx.Next()
 		} else {
 			ctx.Next()
+			return
 		}
 	}
 }

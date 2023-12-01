@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"example.com/api/model"
@@ -116,8 +117,35 @@ func (ctrl *UIController) BeersList(ctx *gin.Context) {
 }
 
 func (ctrl *UIController) BeersDetail(ctx *gin.Context) {
-	// TODO: pass data to template
-	ctx.HTML(http.StatusOK, "beers_detail.tmpl", gin.H{})
+	beerIDStr := ctx.Param("beerId")
+	beerID, err := strconv.Atoi(beerIDStr)
+	if err != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
+	beer := ctrl.beerService.FindById(uint(beerID))
+	if beer == nil {
+		ctx.HTML(http.StatusNotFound, "error", gin.H{
+			"error": "Your requested beer was not found",
+		})
+		return
+	}
+
+	var hasUpvoted bool = false
+	currentUser, usrKeyExists := ctx.Get("user")
+	if usrKeyExists && currentUser != nil {
+		hasUpvoted = ctrl.upvoteService.CheckIfUserUpvoted(model.Upvote{
+			BeerID: beer.ID,
+			UserID: currentUser.(*model.User).ID,
+		})
+	}
+
+	ctx.HTML(http.StatusOK, "beers_detail", gin.H{
+		"Beer":        *beer,
+		"UserUpvoted": hasUpvoted,
+	})
 }
 
 func (ctrl *UIController) BeersCreateGET(ctx *gin.Context) {

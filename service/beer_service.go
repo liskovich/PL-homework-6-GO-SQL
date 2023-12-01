@@ -84,9 +84,12 @@ func (brService *BeerServiceImpl) FindById(beerID uint) *model.BeerDetailed {
 	case err != nil:
 		panic(err)
 	default:
-		comments, cmntErr := brService.CommentRepository.GetAllBeerComments(beerID)
+		var comments []model.Comment
+		var cmntErr error
+		comments, cmntErr = brService.CommentRepository.GetAllBeerComments(beerID)
+
 		if cmntErr != nil {
-			panic(cmntErr)
+			comments = []model.Comment{}
 		}
 		beerResponse := model.BeerDetailed{
 			ID:           result.ID,

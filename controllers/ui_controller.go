@@ -39,8 +39,22 @@ func (ctrl *UIController) Index(ctx *gin.Context) {
 }
 
 func (ctrl *UIController) UserDashboard(ctx *gin.Context) {
-	// TODO: pass data to template
-	ctx.HTML(http.StatusOK, "dashboard", gin.H{})
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists && currentUser == nil {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "You must be logged in to access dashboard",
+		})
+		return
+	}
+
+	userId := currentUser.(*model.User).ID
+	beers := ctrl.beerService.FindByUser(userId)
+	comments := ctrl.commentService.FindAllUsersComments(userId)
+
+	ctx.HTML(http.StatusOK, "dashboard", gin.H{
+		"Beers":    beers,
+		"Comments": comments,
+	})
 }
 
 // auth endpoints
@@ -184,7 +198,7 @@ func (ctrl *UIController) BeersEditGET(ctx *gin.Context) {
 	currentUser, usrKeyExists := ctx.Get("user")
 	if !usrKeyExists && currentUser == nil {
 		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
-			"error": "You must be logged in to create a beer",
+			"error": "You must be logged in to edit a beer",
 		})
 		return
 	}
@@ -220,7 +234,7 @@ func (ctrl *UIController) BeersEditPOST(ctx *gin.Context) {
 	currentUser, usrKeyExists := ctx.Get("user")
 	if !usrKeyExists && currentUser == nil {
 		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
-			"error": "You must be logged in to create a beer",
+			"error": "You must be logged in to edit a beer",
 		})
 		return
 	}

@@ -13,7 +13,7 @@ type BeerService interface {
 	Update(beerID uint, beer model.BeerMutate)
 	Delete(beerID uint, userID uint)
 	FindById(beerID uint) *model.BeerDetailed
-	FindByUser(userID uint) []*model.BeerCompact
+	FindByUser(userID uint) []model.BeerCompact
 	FindAll() []model.BeerCompact
 }
 
@@ -105,7 +105,7 @@ func (brService *BeerServiceImpl) FindById(beerID uint) *model.BeerDetailed {
 	}
 }
 
-func (brService *BeerServiceImpl) FindByUser(userID uint) []*model.BeerCompact {
+func (brService *BeerServiceImpl) FindByUser(userID uint) []model.BeerCompact {
 	result, err := brService.BeerRepository.GetBeersByUser(userID)
 	switch {
 	case err == sql.ErrNoRows:

@@ -4,9 +4,135 @@
   <head>
     <meta charset="UTF-8" />
     <title>BeerHunt</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      header h1 {
+        margin: 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        text-decoration: none;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .btn:hover {
+        background-color: #d32f2f;
+      }
+      main {
+        padding: 20px;
+      }
+      section {
+        margin-bottom: 40px;
+      }
+      section h2 {
+        text-align: center;
+      }
+      .section-img {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+      }
+      .section-img div {
+        flex: 0 0 45%;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .section-img img {
+        width: 100%;
+        max-height: 400px;
+        height: auto;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+      .author {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        font-style: italic;
+      }
+      .section-text {
+        text-align: justify;
+      }
+      .centerText {
+        text-align: center;
+      }
+      .spacedSection {
+        margin-top: 50px;
+        margin-bottom: 70px;
+      }
+      /* Your CSS styles for beer cards here */
+      .beer-cards {
+        width: 100%;
+      }
+      .beer-card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+      }
+      .beer-thumbnail {
+        max-width: 100%;
+        height: auto;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      .beer-info {
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+      .beer-description {
+        font-size: 14px;
+        color: #666;
+      }
+    </style>
   </head>
   <body>
-    <p>Hello</p>
+    <h1>Your Created Beers</h1>
+    <div class="beer-cards">
+      {{ range .Beers }}
+      <div class="beer-card">
+        <div class="beer-info">
+          <strong>{{ .Name }}</strong>
+          <p>Comments: {{ .CommentCount }}, Upvotes: {{ .UpvoteCount }}</p>
+        </div>
+        <div class="beer-description">
+          <p>{{ .Description }}</p>
+        </div>
+      </div>
+      {{ end }}
+    </div>
+    <div>
+      <h2>Your comments</h2>
+      {{ if .Comments }} {{ range .Comments }}
+      <div class="comment-card">
+        <strong>{{ .BeerID }}</strong>
+        <p class="comment_created_date">{{ .CreatedDate }}</p>
+        <p>{{ .Content }}</p>
+      </div>
+      {{ end }} {{ else }}
+      <p>No comments yet.</p>
+      {{ end }}
+    </div>
   </body>
 </html>
 {{ end }}

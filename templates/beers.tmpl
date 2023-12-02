@@ -84,17 +84,28 @@
         width: 100%;
       }
       .beer-card {
+        display: flex;
         border: 1px solid #ccc;
         border-radius: 5px;
         padding: 10px;
+        margin: 0 auto;
         margin-bottom: 20px;
+        overflow: hidden;
+        max-width: 800px;
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
       }
+      .image-column {
+        flex: 0 0 30%;
+      }
+      .text-column {
+        flex: 1;
+        padding: 20px;
+      }
       .beer-thumbnail {
-        max-width: 100%;
-        height: auto;
+        width: 100%;
+        height: 200px;
         border-radius: 5px;
-        margin-bottom: 10px;
+        object-fit: cover;
       }
       .beer-info {
         font-size: 16px;
@@ -104,25 +115,56 @@
         font-size: 14px;
         color: #666;
       }
+      .page-title-container {
+        max-width: 800px;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        margin-top: 30px;
+      }
+      .beer-card-title {
+        color: #f44336;
+        font-weight: bold;
+        font-size: 24px;
+      }
     </style>
   </head>
   <body>
-    <h1>Beer List</h1>
-    <div class="beer-cards">
-      {{ range .Beers }}
-      <div class="beer-card">
-        <img src="{{ .Thumbnail }}" alt="{{ .Name }}" class="beer-thumbnail" />
-        <div class="beer-info">
-          <strong>{{ .Name }}</strong>
-          <p>Comments: {{ .CommentCount }}, Upvotes: {{ .UpvoteCount }}</p>
-        </div>
-        <div class="beer-description">
-          <p>{{ .Description }}</p>
-          <p>Author ID: {{ .AuthorId }}</p>
-        </div>
+    <header>
+      <h1>BeerHunt 🍻</h1>
+    </header>
+
+    <main>
+      <div class="page-title-container">
+        <a href="/">To Home 🏠</a>
+        <h1>Beer List</h1>
       </div>
-      {{ end }}
-    </div>
+      <div class="beer-cards">
+        {{ range .Beers }}
+        <div class="beer-card">
+          <div class="image-column">
+            <img
+              src="{{ .Thumbnail }}"
+              alt="{{ .Name }}"
+              class="beer-thumbnail"
+            />
+          </div>
+          <div class="text-column">
+            <div class="beer-info">
+              <a class="beer-card-title" href="/beers/{{ .ID }}">
+                {{ .Name }}
+              </a>
+              <p>Comments: <b>{{ .CommentCount }}</b></p>
+              <p>Upvotes: <b>{{ .UpvoteCount }}</b></p>
+            </div>
+            <hr>
+            <div class="beer-description">
+              <p>{{ .Description }}</p>
+            </div>
+          </div>
+        </div>
+        {{ end }}
+      </div>
+    </main>
   </body>
 </html>
 {{ end }}

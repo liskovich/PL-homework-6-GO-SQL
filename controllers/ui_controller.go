@@ -251,6 +251,27 @@ func (ctrl *UIController) BeersEditPOST(ctx *gin.Context) {
 }
 
 func (ctrl *UIController) BeersDeletePOST(ctx *gin.Context) {
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists && currentUser == nil {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "You must be logged in to create a beer",
+		})
+		return
+	}
+
+	beerIDStr := ctx.Param("beerId")
+	beerID, err := strconv.Atoi(beerIDStr)
+	if err != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
+
+	ctrl.beerService.Delete(
+		uint(beerID),
+		currentUser.(*model.User).ID,
+	)
 	ctx.Redirect(http.StatusFound, "/beers")
 }
 

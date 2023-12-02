@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -180,13 +181,73 @@ func (ctrl *UIController) BeersCreatePOST(ctx *gin.Context) {
 }
 
 func (ctrl *UIController) BeersEditGET(ctx *gin.Context) {
-	// TODO: pass data to template
-	ctx.HTML(http.StatusOK, "beers_edit.tmpl", gin.H{})
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists && currentUser == nil {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "You must be logged in to create a beer",
+		})
+		return
+	}
+
+	beerIDStr := ctx.Param("beerId")
+	beerID, err := strconv.Atoi(beerIDStr)
+	if err != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
+	beer := ctrl.beerService.FindById(uint(beerID))
+	if beer == nil {
+		ctx.HTML(http.StatusNotFound, "error", gin.H{
+			"error": "Your requested beer was not found",
+		})
+		return
+	}
+
+	if beer.AuthorId != currentUser.(*model.User).ID {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "Your have to be the author of the beer to edit it",
+		})
+		return
+	}
+	ctx.HTML(http.StatusOK, "beers_edit", gin.H{
+		"Beer": beer,
+	})
 }
 
 func (ctrl *UIController) BeersEditPOST(ctx *gin.Context) {
-	// TODO: redirect to updated beer
-	ctx.Redirect(http.StatusFound, "/beers")
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists && currentUser == nil {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "You must be logged in to create a beer",
+		})
+		return
+	}
+
+	beerIDStr := ctx.Param("beerId")
+	beerID, err := strconv.Atoi(beerIDStr)
+	if err != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
+
+	var body model.BeerMutate
+	body.Name = ctx.PostForm("name")
+	body.Description = ctx.PostForm("description")
+	body.Thumbnail = ctx.PostForm("thumbnail")
+	body.AuthorId = currentUser.(*model.User).ID
+	if ctx.Bind(&body) != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Failed to parse request body",
+		})
+		return
+	}
+
+	ctrl.beerService.Update(uint(beerID), body)
+	ctx.Redirect(http.StatusFound, fmt.Sprintf("/beers/%v", beerID))
 }
 
 func (ctrl *UIController) BeersDeletePOST(ctx *gin.Context) {

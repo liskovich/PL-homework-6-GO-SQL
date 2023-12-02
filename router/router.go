@@ -174,9 +174,14 @@ func NewRouter(
 		uiController.CommentPOST,
 	)
 	uiRouter.POST(
-		"/beers/:beerId/vote",
+		"/beers/:beerId/upvote",
 		auth,
-		uiController.UpvoteDownvotePOST,
+		uiController.UpvotePOST,
+	)
+	uiRouter.POST(
+		"/beers/:beerId/downvote",
+		auth,
+		uiController.DownvotePOST,
 	)
 
 	return router

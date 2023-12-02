@@ -88,14 +88,20 @@
         border: 1px solid #ccc;
         border-radius: 5px;
         padding: 10px;
+        margin: 0 auto;
         margin-bottom: 20px;
+        max-width: 800px;
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
       }
+      .img-container {
+        text-align: center;
+      }
       .beer-thumbnail {
-        max-width: 100%;
-        height: auto;
+        display: block;
+        margin: 0 auto;
+        max-height: 300px;
         border-radius: 5px;
-        margin-bottom: 10px;
+        object-fit: cover;
       }
       .beer-info {
         font-size: 16px;
@@ -104,6 +110,17 @@
       .beer-description {
         font-size: 14px;
         color: #666;
+      }
+      .page-title-container {
+        max-width: 800px;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        margin-top: 30px;
+      }
+      .beer-card-title {
+        color: #f44336;
+        font-weight: bold;
+        font-size: 24px;
       }
       /* TODO: update this style */
       .upvote-block {
@@ -117,41 +134,95 @@
         font-size: 11px;
         font-style: italic;
       }
+      a.non-clickable {
+        pointer-events: none;
+      }
+      .comment-input {
+        width: 300px;
+        padding: 5px;
+      }
+      .user-not-loggedin {
+        font-style: italic;
+      }
     </style>
   </head>
   <body>
-    <h1>{{ .Beer.Name }}</h1>
-    <div class="beer-card">
-      <img
-        src="{{ .Beer.Thumbnail }}"
-        alt="{{ .Beer.Name }}"
-        class="beer-thumbnail"
-      />
-      <div class="beer-info">
-        <p>
-          Comments: {{ .Beer.CommentCount }}, Upvotes: {{ .Beer.UpvoteCount }}
-        </p>
+    <header>
+      <h1>BeerHunt 🍻</h1>
+    </header>
+
+    <main>
+      <div class="page-title-container">
+        <a href="/beers">To All Beers</a>
+        <h1>{{ .Beer.Name }}</h1>
+      </div>
+      <div class="beer-card">
+        <div class="img-container">
+          <img
+            src="{{ .Beer.Thumbnail }}"
+            alt="{{ .Beer.Name }}"
+            class="beer-thumbnail"
+          />
+        </div>
+        <div class="beer-info">
+          <p>Comments: <b>{{ .Beer.CommentCount }}</b></p>
+          <p>Upvotes: <b>{{ .Beer.UpvoteCount }}</b></p>
+        </div>
+        <hr />
+        <div class="beer-description">
+          <p>{{ .Beer.Description }}</p>
+        </div>
+        <hr />
+
         <!-- TODO: add a check if already upvoted -->
         <div class="upvote-block">
-          <a href="/beers/{{ .Beer.ID }}/vote">Upvote!</a>
-          <p>Your upvote status: {{ .UserUpvoted }}</p>
+          {{ if .UserLoggedIn }} {{ if .UserUpvoted }}
+          <form action="/beers/{{ .Beer.ID }}/downvote">
+            <input type="submit" value="Downvote" class="btn">
+          </form>
+          {{ else }}
+          <form action="/beers/{{ .Beer.ID }}/upvote">
+            <input type="submit" value="Upvote" class="btn">
+          </form>
+          {{ end }} {{ else }}
+          <a class="btn non-clickable">Upvote</a>
+          {{ end }}
         </div>
       </div>
-      <div class="beer-description">
-        <p>{{ .Beer.Description }}</p>
-        <p>Author ID: {{ .Beer.AuthorId }}</p>
+
+      <div class="page-title-container">
+        <h2>Write Your Comment</h2>
+        {{ if .UserLoggedIn }}
+        <form action="/beers/{{ .Beer.ID }}/comment" method="post">
+          <p>
+            <input
+              class="comment-input"
+              type="text"
+              name="content"
+              placeholder="Your comment..."
+              required
+            />
+          </p>
+          <p>
+            <input type="submit" value="Comment" class="btn" />
+          </p>
+        </form>
+        {{ else }}
+        <p class="user-not-loggedin">You have to be logged in to comment1</p>
+        {{ end }}
+
+        <h2>Comments</h2>
+        {{ if .Beer.Comments }} {{ range .Beer.Comments }}
+        <div class="comment-card">
+          <strong>{{ .Author }}</strong>
+          <p class="comment_created_date">{{ .CreatedDate }}</p>
+          <p>{{ .Content }}</p>
+        </div>
+        {{ end }} {{ else }}
+        <p>No comments yet.</p>
+        {{ end }}
       </div>
-    </div>
-    <h2>Comments</h2>
-    {{ if .Beer.Comments }} {{ range .Beer.Comments }}
-    <div class="comment-card">
-      <strong>{{ .Author }}</strong>
-      <p class="comment_created_date">{{ .CreatedDate }}</p>
-      <p>{{ .Content }}</p>
-    </div>
-    {{ end }} {{ else }}
-    <p>No comments yet.</p>
-    {{ end }}
+    </main>
   </body>
 </html>
 {{ end }}

@@ -160,8 +160,9 @@ func (ctrl *UIController) BeersDetail(ctx *gin.Context) {
 	}
 
 	ctx.HTML(http.StatusOK, "beers_detail", gin.H{
-		"Beer":        *beer,
-		"UserUpvoted": hasUpvoted,
+		"Beer":         *beer,
+		"UserUpvoted":  hasUpvoted,
+		"UserLoggedIn": usrKeyExists && currentUser != nil,
 	})
 }
 
@@ -291,11 +292,118 @@ func (ctrl *UIController) BeersDeletePOST(ctx *gin.Context) {
 
 // additional features
 func (ctrl *UIController) CommentPOST(ctx *gin.Context) {
-	// TODO: redirect to the commented beer
-	ctx.Redirect(http.StatusFound, "/beers")
+	beerIDStr := ctx.Param("beerId")
+	beerID, paramErr := strconv.Atoi(beerIDStr)
+	if paramErr != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists || currentUser == nil {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "You must be logged in to comment",
+		})
+		return
+	}
+
+	var body model.CommentMutate
+	body.Content = ctx.PostForm("content")
+	body.AuthorID = currentUser.(*model.User).ID
+	body.Author = currentUser.(*model.User).Name
+	body.BeerID = uint(beerID)
+	body.CreatedDate = time.Now().Unix()
+	if ctx.Bind(&body) != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Failed to parse request body",
+		})
+		return
+	}
+
+	beerToComment := ctrl.beerService.FindById(body.BeerID)
+	if beerToComment == nil {
+		ctx.HTML(http.StatusNotFound, "error", gin.H{
+			"error": "The beer you wanted to comment was not found",
+		})
+		return
+	}
+	ctrl.commentService.Create(body)
+	ctx.Redirect(http.StatusFound, fmt.Sprintf("/beers/%v", beerID))
 }
 
-func (ctrl *UIController) UpvoteDownvotePOST(ctx *gin.Context) {
-	// TODO: redirect to the upvoted / downvoted beer
-	ctx.Redirect(http.StatusFound, "/beers")
+func (ctrl *UIController) UpvotePOST(ctx *gin.Context) {
+	beerIDStr := ctx.Param("beerId")
+	beerID, paramErr := strconv.Atoi(beerIDStr)
+	if paramErr != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists || currentUser == nil {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "You must be logged in to upvote",
+		})
+		return
+	}
+	var body model.Upvote
+	body.UserID = currentUser.(*model.User).ID
+	body.BeerID = uint(beerID)
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Failed to parse request body",
+		})
+		return
+	}
+
+	beerToUpvote := ctrl.beerService.FindById(body.BeerID)
+	if beerToUpvote == nil {
+		ctx.HTML(http.StatusNotFound, "error", gin.H{
+			"error": "The beer you wanted to upvote was not found",
+		})
+		return
+	}
+	ctrl.upvoteService.Upvote(body)
+	ctx.Redirect(http.StatusFound, fmt.Sprintf("/beers/%v", beerID))
+}
+
+func (ctrl *UIController) DownvotePOST(ctx *gin.Context) {
+	beerIDStr := ctx.Param("beerId")
+	beerID, paramErr := strconv.Atoi(beerIDStr)
+	if paramErr != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Invalid beer ID provided",
+		})
+		return
+	}
+	currentUser, usrKeyExists := ctx.Get("user")
+	if !usrKeyExists || currentUser == nil {
+		ctx.HTML(http.StatusUnauthorized, "error", gin.H{
+			"error": "You must be logged in to upvote",
+		})
+		return
+	}
+	var body model.Upvote
+	body.UserID = currentUser.(*model.User).ID
+	body.BeerID = uint(beerID)
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		ctx.HTML(http.StatusBadRequest, "error", gin.H{
+			"error": "Failed to parse request body",
+		})
+		return
+	}
+
+	beerToUpvote := ctrl.beerService.FindById(body.BeerID)
+	if beerToUpvote == nil {
+		ctx.HTML(http.StatusNotFound, "error", gin.H{
+			"error": "The beer you wanted to upvote was not found",
+		})
+		return
+	}
+	ctrl.upvoteService.Downvote(body)
+	ctx.Redirect(http.StatusFound, fmt.Sprintf("/beers/%v", beerID))
 }

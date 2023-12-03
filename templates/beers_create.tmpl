@@ -80,12 +80,70 @@
         margin-bottom: 70px;
       }
       /* Your CSS styles for beer cards here */
+      /* TODO: update this style */
+      .beer-cards {
+        width: 100%;
+      }
       .beer-card {
         border: 1px solid #ccc;
         border-radius: 5px;
         padding: 10px;
+        margin: 0 auto;
         margin-bottom: 20px;
+        max-width: 800px;
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+      }
+      .img-container {
+        text-align: center;
+      }
+      .beer-thumbnail {
+        display: block;
+        margin: 0 auto;
+        max-height: 300px;
+        border-radius: 5px;
+        object-fit: cover;
+      }
+      .beer-info {
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+      .beer-description {
+        font-size: 14px;
+        color: #666;
+      }
+      .page-title-container {
+        max-width: 800px;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        margin-top: 30px;
+      }
+      .beer-card-title {
+        color: #f44336;
+        font-weight: bold;
+        font-size: 24px;
+      }
+      /* TODO: update this style */
+      .upvote-block {
+        width: 100%;
+      }
+      /* TODO: update this style */
+      .comment-card {
+        width: 100%;
+      }
+      .comment_created_date {
+        font-size: 11px;
+        font-style: italic;
+      }
+      a.non-clickable {
+        pointer-events: none;
+      }
+      .comment-input {
+        width: 80%;
+        padding: 5px;
+        margin-bottom: 10px;
+      }
+      .user-not-loggedin {
+        font-style: italic;
       }
       .explanation-text {
         font-size: 10px;
@@ -94,31 +152,47 @@
     </style>
   </head>
   <body>
-    <h1>Create a New Beer</h1>
-    <div class="beer-card">
-      <form action="/beers/create" method="post">
-        <input type="text" name="name" placeholder="Beer Name" required /><br />
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          required
-        /><br />
-        <!-- TODO: add more validation to -->
-        <!-- TODO: if user leaves thumbnail empty, provide some default value for it -->
-        <input
-          type="text"
-          name="thumbnail"
-          placeholder="Thumbnail Picture"
-          required
-        /><br />
-        <p class="explanation-text">
-          Provide a URL to your desired beer thumbnail picture. It must end with
-          an image extenstion (.png, .jpeg, .jpg, ...).
-        </p>
-        <input type="submit" value="Create" />
-      </form>
-    </div>
+    <header>
+      <h1>BeerHunt 🍻</h1>
+    </header>
+
+    <main>
+      <div class="page-title-container">
+        <a href="/beers">To All Beers</a>
+        <h1>Create a New Beer</h1>
+      </div>
+      <div class="beer-card">
+        <form action="/beers/create" method="post">
+          <input
+            type="text"
+            name="name"
+            placeholder="Beer Name"
+            class="comment-input"
+            required
+          /><br />
+          <input
+            type="text"
+            name="description"
+            placeholder="Description"
+            class="comment-input"
+            required
+          /><br />
+          <!-- TODO: add more validation to -->
+          <input
+            type="text"
+            name="thumbnail"
+            placeholder="Thumbnail Picture"
+            class="comment-input"
+            required
+          /><br />
+          <p class="explanation-text">
+            Provide a URL to your desired beer thumbnail picture. It must end
+            with an image extenstion (.png, .jpeg, .jpg, ...).
+          </p>
+          <input type="submit" value="Create" class="btn" />
+        </form>
+      </div>
+    </main>
   </body>
 </html>
 {{ end }}

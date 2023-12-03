@@ -174,18 +174,18 @@
         </div>
         <hr />
 
-        <!-- TODO: add a check if already upvoted -->
+        <!-- TODO: send an empty post request when user upvoted -->
         <div class="upvote-block">
           {{ if .UserLoggedIn }} {{ if .UserUpvoted }}
-          <form action="/beers/{{ .Beer.ID }}/downvote">
+          <form action="/beers/{{ .Beer.ID }}/downvote" method="post">
             <input type="submit" value="Downvote" class="btn">
           </form>
           {{ else }}
-          <form action="/beers/{{ .Beer.ID }}/upvote">
+          <form action="/beers/{{ .Beer.ID }}/upvote" method="post">
             <input type="submit" value="Upvote" class="btn">
           </form>
           {{ end }} {{ else }}
-          <a class="btn non-clickable">Upvote</a>
+          <a class="btn non-clickable">You must be logged in to upvote</a>
           {{ end }}
         </div>
       </div>
@@ -208,7 +208,7 @@
           </p>
         </form>
         {{ else }}
-        <p class="user-not-loggedin">You have to be logged in to comment1</p>
+        <p class="user-not-loggedin">You have to be logged in to comment</p>
         {{ end }}
 
         <h2>Comments</h2>

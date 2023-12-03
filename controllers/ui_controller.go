@@ -351,8 +351,7 @@ func (ctrl *UIController) UpvotePOST(ctx *gin.Context) {
 	var body model.Upvote
 	body.UserID = currentUser.(*model.User).ID
 	body.BeerID = uint(beerID)
-	err := ctx.ShouldBindJSON(&body)
-	if err != nil {
+	if ctx.Bind(&body) != nil {
 		ctx.HTML(http.StatusBadRequest, "error", gin.H{
 			"error": "Failed to parse request body",
 		})
@@ -389,8 +388,7 @@ func (ctrl *UIController) DownvotePOST(ctx *gin.Context) {
 	var body model.Upvote
 	body.UserID = currentUser.(*model.User).ID
 	body.BeerID = uint(beerID)
-	err := ctx.ShouldBindJSON(&body)
-	if err != nil {
+	if ctx.Bind(&body) != nil {
 		ctx.HTML(http.StatusBadRequest, "error", gin.H{
 			"error": "Failed to parse request body",
 		})

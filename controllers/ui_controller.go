@@ -70,13 +70,11 @@ func (ctrl *UIController) LoginGET(ctx *gin.Context) {
 }
 
 func (ctrl *UIController) RegisterPOST(ctx *gin.Context) {
-	body := model.UserMutate{
-		Name:     ctx.PostForm("username"),
-		Email:    ctx.PostForm("email"),
-		Password: ctx.PostForm("password"),
-	}
-	err := ctx.ShouldBindJSON(&body)
-	if err != nil {
+	var body model.UserMutate
+	body.Name = ctx.PostForm("username")
+	body.Email = ctx.PostForm("email")
+	body.Password = ctx.PostForm("password")
+	if ctx.Bind(&body) != nil {
 		ctx.HTML(http.StatusBadRequest, "error", gin.H{
 			"error": "Failed to parse request body",
 		})

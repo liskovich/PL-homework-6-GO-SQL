@@ -1,16 +1,177 @@
 {{ define "login" }}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-<body>
-    <form action="/login" method="post">
-        <input type="email" name="email" placeholder="Email"><br>
-        <input type="password" name="password" placeholder="Password"><br>
-        <input type="submit" value="Login">
-    </form>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>BeerHunt</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      header h1 {
+        margin: 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        text-decoration: none;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .btn:hover {
+        background-color: #d32f2f;
+      }
+      main {
+        padding: 20px;
+      }
+      section {
+        margin-bottom: 40px;
+      }
+      section h2 {
+        text-align: center;
+      }
+      .section-img {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+      }
+      .section-img div {
+        flex: 0 0 45%;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .section-img img {
+        width: 100%;
+        max-height: 400px;
+        height: auto;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+      .author {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        font-style: italic;
+      }
+      .section-text {
+        text-align: justify;
+      }
+      .centerText {
+        text-align: center;
+      }
+      .spacedSection {
+        margin-top: 50px;
+        margin-bottom: 70px;
+      }
+      /* Your CSS styles for beer cards here */
+      /* TODO: update this style */
+      .beer-cards {
+        width: 100%;
+      }
+      .beer-card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        max-width: 800px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+      }
+      .img-container {
+        text-align: center;
+      }
+      .beer-thumbnail {
+        display: block;
+        margin: 0 auto;
+        max-height: 300px;
+        border-radius: 5px;
+        object-fit: cover;
+      }
+      .beer-info {
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+      .beer-description {
+        font-size: 14px;
+        color: #666;
+      }
+      .page-title-container {
+        max-width: 800px;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        margin-top: 30px;
+      }
+      .beer-card-title {
+        color: #f44336;
+        font-weight: bold;
+        font-size: 24px;
+      }
+      /* TODO: update this style */
+      .upvote-block {
+        width: 100%;
+      }
+      /* TODO: update this style */
+      .comment-card {
+        width: 100%;
+      }
+      .comment_created_date {
+        font-size: 11px;
+        font-style: italic;
+      }
+      a.non-clickable {
+        pointer-events: none;
+      }
+      .comment-input {
+        width: 300px;
+        padding: 5px;
+        margin-bottom: 10px;
+      }
+      .user-not-loggedin {
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>BeerHunt 🍻</h1>
+    </header>
+
+    <main>
+      <div class="page-title-container">
+        <h2>Log In</h2>
+        <form action="/login" method="post">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            class="comment-input"
+          /><br />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            class="comment-input"
+          /><br />
+          <input type="submit" value="Login" class="btn" />
+        </form>
+      </div>
+    </main>
+  </body>
 </html>
 {{ end }}

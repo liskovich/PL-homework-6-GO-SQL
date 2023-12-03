@@ -80,6 +80,7 @@
         margin-bottom: 70px;
       }
       /* Your CSS styles for beer cards here */
+      /* TODO: update this style */
       .beer-cards {
         width: 100%;
       }
@@ -87,14 +88,20 @@
         border: 1px solid #ccc;
         border-radius: 5px;
         padding: 10px;
+        margin: 0 auto;
         margin-bottom: 20px;
+        max-width: 800px;
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
       }
+      .img-container {
+        text-align: center;
+      }
       .beer-thumbnail {
-        max-width: 100%;
-        height: auto;
+        display: block;
+        margin: 0 auto;
+        max-height: 300px;
         border-radius: 5px;
-        margin-bottom: 10px;
+        object-fit: cover;
       }
       .beer-info {
         font-size: 16px;
@@ -104,35 +111,80 @@
         font-size: 14px;
         color: #666;
       }
+      .page-title-container {
+        max-width: 800px;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        margin-top: 30px;
+      }
+      .beer-card-title {
+        color: #f44336;
+        font-weight: bold;
+        font-size: 24px;
+      }
+      /* TODO: update this style */
+      .upvote-block {
+        width: 100%;
+      }
+      /* TODO: update this style */
+      .comment-card {
+        width: 100%;
+      }
+      .comment_created_date {
+        font-size: 11px;
+        font-style: italic;
+      }
+      a.non-clickable {
+        pointer-events: none;
+      }
+      .comment-input {
+        width: 300px;
+        padding: 5px;
+      }
+      .user-not-loggedin {
+        font-style: italic;
+      }
     </style>
   </head>
   <body>
-    <h1>Your Created Beers</h1>
-    <div class="beer-cards">
-      {{ range .Beers }}
-      <div class="beer-card">
-        <div class="beer-info">
-          <strong>{{ .Name }}</strong>
-          <p>Comments: {{ .CommentCount }}, Upvotes: {{ .UpvoteCount }}</p>
-        </div>
-        <div class="beer-description">
-          <p>{{ .Description }}</p>
-        </div>
+    <header>
+      <h1>BeerHunt 🍻</h1>
+    </header>
+
+    <main>
+      <div class="page-title-container">
+        <a href="/beers">To All Beers</a>
+        <h1>Your Created Beers</h1>
       </div>
-      {{ end }}
-    </div>
-    <div>
-      <h2>Your comments</h2>
-      {{ if .Comments }} {{ range .Comments }}
-      <div class="comment-card">
-        <strong>{{ .BeerID }}</strong>
-        <p class="comment_created_date">{{ .CreatedDate }}</p>
-        <p>{{ .Content }}</p>
+      <div class="beer-cards">
+        {{ range .Beers }}
+        <div class="beer-card">
+          <div class="beer-info">
+            <a href="/beers/{{ .ID }}">
+              <strong>{{ .Name }}</strong>
+            </a>
+            <p>Comments: {{ .CommentCount }}, Upvotes: {{ .UpvoteCount }}</p>
+          </div>
+          <div class="beer-description">
+            <p>{{ .Description }}</p>
+          </div>
+        </div>
+        {{ end }}
       </div>
-      {{ end }} {{ else }}
-      <p>No comments yet.</p>
-      {{ end }}
-    </div>
+      <div class="page-title-container">
+        <h2>Your comments</h2>
+        {{ if .Comments }} {{ range .Comments }}
+        <hr />
+        <div class="comment-card">
+          <a href="/beers/{{ .BeerID }}">Go to Beer</a>
+          <p class="comment_created_date">{{ .CreatedDate }}</p>
+          <p>{{ .Content }}</p>
+        </div>
+        {{ end }} {{ else }}
+        <p>No comments yet.</p>
+        {{ end }}
+      </div>
+    </main>
   </body>
 </html>
 {{ end }}

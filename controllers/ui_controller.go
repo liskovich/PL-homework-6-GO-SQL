@@ -35,7 +35,10 @@ func NewUIController(
 }
 
 func (ctrl *UIController) Index(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "index", gin.H{})
+	currentUser, usrKeyExists := ctx.Get("user")
+	ctx.HTML(http.StatusOK, "index", gin.H{
+		"UserLoggedIn": usrKeyExists && currentUser != nil,
+	})
 }
 
 func (ctrl *UIController) UserDashboard(ctx *gin.Context) {
@@ -127,9 +130,11 @@ func (ctrl *UIController) LogoutPOST(ctx *gin.Context) {
 
 // beer basic CRUD
 func (ctrl *UIController) BeersList(ctx *gin.Context) {
+	currentUser, usrKeyExists := ctx.Get("user")
 	beers := ctrl.beerService.FindAll()
 	ctx.HTML(http.StatusOK, "beers", gin.H{
-		"Beers": beers,
+		"Beers":        beers,
+		"UserLoggedIn": usrKeyExists && currentUser != nil,
 	})
 }
 
@@ -151,18 +156,21 @@ func (ctrl *UIController) BeersDetail(ctx *gin.Context) {
 	}
 
 	var hasUpvoted bool = false
+	var isAuthor bool = false
 	currentUser, usrKeyExists := ctx.Get("user")
 	if usrKeyExists && currentUser != nil {
 		hasUpvoted = ctrl.upvoteService.CheckIfUserUpvoted(model.Upvote{
 			BeerID: beer.ID,
 			UserID: currentUser.(*model.User).ID,
 		})
+		isAuthor = beer.AuthorId == currentUser.(*model.User).ID
 	}
 
 	ctx.HTML(http.StatusOK, "beers_detail", gin.H{
 		"Beer":         *beer,
 		"UserUpvoted":  hasUpvoted,
 		"UserLoggedIn": usrKeyExists && currentUser != nil,
+		"UserIsAuthor": isAuthor,
 	})
 }
 

@@ -101,6 +101,7 @@ func NewRouter(
 
 	uiRouter.GET(
 		"/",
+		optionalUserDetail,
 		uiController.Index,
 	)
 	uiRouter.GET(
@@ -134,6 +135,7 @@ func NewRouter(
 	// basic beer CRUD
 	uiRouter.GET(
 		"/beers",
+		optionalUserDetail,
 		uiController.BeersList,
 	)
 	uiRouter.GET(
@@ -162,7 +164,7 @@ func NewRouter(
 		uiController.BeersEditPOST,
 	)
 	uiRouter.POST(
-		"/beers/delete",
+		"/beers/:beerId/delete",
 		auth,
 		uiController.BeersDeletePOST,
 	)

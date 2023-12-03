@@ -11,6 +11,10 @@
         padding: 0;
       }
       header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
         background-color: #333;
         color: white;
         padding: 20px;
@@ -18,6 +22,10 @@
       }
       header h1 {
         margin: 0;
+      }
+      .right-section {
+        display: flex;
+        gap: 10px;
       }
       .btn {
         display: inline-block;
@@ -149,11 +157,40 @@
   <body>
     <header>
       <h1>BeerHunt 🍻</h1>
+      <div class="right-section">
+        {{ if .UserLoggedIn }}
+        <form action="/logout" method="post">
+          <input type="submit" value="Log Out" class="btn" />
+        </form>
+        {{ else }}
+        <a href="/login" class="btn">Log In</a>
+        <a href="/register" class="btn">Register</a>
+        {{ end }}
+      </div>
     </header>
 
     <main>
       <div class="page-title-container">
         <a href="/beers">To All Beers</a>
+        <div class="right-section">
+          {{ if .UserIsAuthor }}
+          <br />
+          <a
+            href="/beers/{{ .Beer.ID }}/edit"
+            class="btn"
+            style="margin-top: 20px"
+            >Edit</a
+          >
+          <form action="/beers/{{ .Beer.ID }}/delete" method="post">
+            <input
+              type="submit"
+              value="Delete"
+              class="btn"
+              style="margin-top: 20px"
+            />
+          </form>
+          {{ end }}
+        </div>
         <h1>{{ .Beer.Name }}</h1>
       </div>
       <div class="beer-card">
@@ -178,11 +215,11 @@
         <div class="upvote-block">
           {{ if .UserLoggedIn }} {{ if .UserUpvoted }}
           <form action="/beers/{{ .Beer.ID }}/downvote" method="post">
-            <input type="submit" value="Downvote" class="btn">
+            <input type="submit" value="Downvote" class="btn" />
           </form>
           {{ else }}
           <form action="/beers/{{ .Beer.ID }}/upvote" method="post">
-            <input type="submit" value="Upvote" class="btn">
+            <input type="submit" value="Upvote" class="btn" />
           </form>
           {{ end }} {{ else }}
           <a class="btn non-clickable">You must be logged in to upvote</a>

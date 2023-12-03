@@ -1,4 +1,5 @@
 {{ define "index" }}
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,6 +11,10 @@
         padding: 0;
       }
       header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
         background-color: #333;
         color: white;
         padding: 20px;
@@ -17,6 +22,10 @@
       }
       header h1 {
         margin: 0;
+      }
+      .right-section {
+        display: flex;
+        gap: 10px;
       }
       .btn {
         display: inline-block;
@@ -84,6 +93,16 @@
   <body>
     <header>
       <h1>BeerHunt 🍻</h1>
+      <div class="right-section">
+        {{ if .UserLoggedIn }}
+        <form action="/logout" method="post">
+          <input type="submit" value="Log Out" class="btn" />
+        </form>
+        {{ else }}
+        <a href="/login" class="btn">Log In</a>
+        <a href="/register" class="btn">Register</a>
+        {{ end }}
+      </div>
     </header>
 
     <main>
